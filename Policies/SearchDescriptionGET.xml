@@ -1,0 +1,12 @@
+<policies>
+	<inbound>
+		<base/>
+	</inbound>
+	<backend>
+		<base/>
+	</backend>
+	<outbound>
+		<base/>
+		<find-and-replace from="{0}.azurewebsites.net" to="{1}.azure-api.net"/>
+	</outbound>
+</policies>

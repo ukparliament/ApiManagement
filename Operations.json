@@ -1,0 +1,539 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "applicationInsightsName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Application Insights for testing."
+            }
+        },
+        "apiManagementName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the API Management."
+            }
+        },
+        "apiSubscriptionAvailability": {
+            "type": "string",
+            "metadata": {
+                "description": "Subscription key to access API Management."
+            }
+        },
+        "environment": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the environment that is being deployed to."
+            }
+        },
+        "releaseId": {
+            "type": "int",
+            "metadata": {
+                "description": "The identifier of the current release record."
+            }
+        }
+    },
+    "variables": {
+        "pingFixedQueryName": "pingfixedquery",
+        "pingSearchAPIName": "pingsearch",
+        "pingIdGeneratorName": "pingidgenerator",
+        "pingAPIManagementName": "apihealth",
+        "pingMaster0TestName": "pingmaster0",
+        "pingMaster1TestName": "pingmaster1"
+    },
+    "resources": [
+        {
+            "comments": "Test Fixed Query.",
+            "type": "microsoft.insights/webtests",
+            "name": "[variables('pingFixedQueryName')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/components/',parameters('applicationInsightsName'))]": "Resource",
+                "34a4fc9c-8817-4c95-8e1b-76e27fbe2699": "f009d98d-028e-48bc-af57-944f3dd9a77c",
+                "Department": "Data & Search",
+                "Environment": "[parameters('environment')]",
+                "ReleaseId": "[parameters('releaseId')]",
+                "Type": "Web Test (Application Insights)"
+            },
+            "properties": {
+                "SyntheticMonitorId": "[variables('pingFixedQueryName')]",
+                "Name": "[variables('pingFixedQueryName')]",
+                "Kind": "ping",
+                "Enabled": true,
+                "Frequency": 300,
+                "Timeout": 30,
+                "Locations": [
+                    {
+                        "Id": "emea-se-sto-edge"
+                    },
+                    {
+                        "Id": "emea-nl-ams-azr"
+                    },
+                    {
+                        "Id": "emea-gb-db3-azr"
+                    },
+                    {
+                        "Id": "emea-fr-pra-edge"
+                    },
+                    {
+                        "Id": "emea-ch-zrh-edge"
+                    }
+                ],
+                "Configuration": {
+                    "WebTest": "[concat('<WebTest Name=\"',variables('pingFixedQueryName'),'\" Enabled=\"True\" Timeout=\"30\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\"><Items><Request Method=\"GET\" Version=\"1.1\" ThinkTime=\"0\" Timeout=\"30\" ParseDependentRequests=\"False\" FollowRedirects=\"True\" RecordResult=\"True\" Cache=\"False\" ResponseTimeGoal=\"0\" Encoding=\"utf-8\" ExpectedHttpStatusCode=\"200\" ExpectedResponseUrl=\"\" ReportingName=\"\" IgnoreHttpStatusCode=\"False\" Url=\"https://',parameters('apiManagementName'),'.azure-api.net/fixed-query/houses?Subscription-Key=',parameters('apiSubscriptionAvailability'),'\"/></Items></WebTest>')]"
+                }
+            },
+            "dependsOn": [
+            ]
+        },
+        {
+            "comments": "Test Search API.",
+            "type": "microsoft.insights/webtests",
+            "name": "[variables('pingSearchAPIName')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/components/',parameters('applicationInsightsName'))]": "Resource",
+                "34a4fc9c-8817-4c95-8e1b-76e27fbe2699": "f009d98d-028e-48bc-af57-944f3dd9a77c",
+                "Department": "Data & Search",
+                "Environment": "[parameters('environment')]",
+                "ReleaseId": "[parameters('releaseId')]",
+                "Type": "Web Test (Application Insights)"
+            },
+            "properties": {
+                "SyntheticMonitorId": "[variables('pingSearchAPIName')]",
+                "Name": "[variables('pingSearchAPIName')]",
+                "Kind": "ping",
+                "Enabled": true,
+                "Frequency": 300,
+                "Timeout": 30,
+                "Locations": [
+                    {
+                        "Id": "emea-se-sto-edge"
+                    },
+                    {
+                        "Id": "emea-nl-ams-azr"
+                    },
+                    {
+                        "Id": "emea-gb-db3-azr"
+                    },
+                    {
+                        "Id": "emea-fr-pra-edge"
+                    },
+                    {
+                        "Id": "emea-ch-zrh-edge"
+                    }
+                ],
+                "Configuration": {
+                    "WebTest": "[concat('<WebTest Name=\"',variables('pingSearchAPIName'),'\" Enabled=\"True\" Timeout=\"30\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\"><Items><Request Method=\"GET\" Version=\"1.1\" ThinkTime=\"0\" Timeout=\"30\" ParseDependentRequests=\"False\" FollowRedirects=\"True\" RecordResult=\"True\" Cache=\"False\" ResponseTimeGoal=\"0\" Encoding=\"utf-8\" ExpectedHttpStatusCode=\"200\" ExpectedResponseUrl=\"\" ReportingName=\"\" IgnoreHttpStatusCode=\"False\" Url=\"https://',parameters('apiManagementName'),'.azure-api.net/search?q=apimanagement&amp;Subscription-Key=',parameters('apiSubscriptionAvailability'),'\"/></Items></WebTest>')]"
+                }
+            },
+            "dependsOn": [
+            ]
+        },
+        {
+            "comments": "Test Id generator (Azure Functions).",
+            "type": "microsoft.insights/webtests",
+            "name": "[variables('pingIdGeneratorName')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/components/',parameters('applicationInsightsName'))]": "Resource",
+                "34a4fc9c-8817-4c95-8e1b-76e27fbe2699": "f009d98d-028e-48bc-af57-944f3dd9a77c",
+                "Department": "Data & Search",
+                "Environment": "[parameters('environment')]",
+                "ReleaseId": "[parameters('releaseId')]",
+                "Type": "Web Test (Application Insights)"
+            },
+            "properties": {
+                "SyntheticMonitorId": "[variables('pingIdGeneratorName')]",
+                "Name": "[variables('pingIdGeneratorName')]",
+                "Kind": "ping",
+                "Enabled": true,
+                "Frequency": 300,
+                "Timeout": 30,
+                "Locations": [
+                    {
+                        "Id": "emea-se-sto-edge"
+                    },
+                    {
+                        "Id": "emea-nl-ams-azr"
+                    },
+                    {
+                        "Id": "emea-gb-db3-azr"
+                    },
+                    {
+                        "Id": "emea-fr-pra-edge"
+                    },
+                    {
+                        "Id": "emea-ch-zrh-edge"
+                    }
+                ],
+                "Configuration": {
+                    "WebTest": "[concat('<WebTest Name=\"',variables('pingIdGeneratorName'),'\" Enabled=\"True\" Timeout=\"30\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\"><Items><Request Method=\"GET\" Version=\"1.1\" ThinkTime=\"0\" Timeout=\"30\" ParseDependentRequests=\"False\" FollowRedirects=\"True\" RecordResult=\"True\" Cache=\"False\" ResponseTimeGoal=\"0\" Encoding=\"utf-8\" ExpectedHttpStatusCode=\"200\" ExpectedResponseUrl=\"\" ReportingName=\"\" IgnoreHttpStatusCode=\"False\" Url=\"https://',parameters('apiManagementName'),'.azure-api.net/id/generate?Subscription-Key=',parameters('apiSubscriptionAvailability'),'\"/></Items></WebTest>')]"
+                }
+            },
+            "dependsOn": [
+            ]
+        },
+        {
+            "comments": "Test API Management.",
+            "type": "microsoft.insights/webtests",
+            "name": "[variables('pingAPIManagementName')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/components/',parameters('applicationInsightsName'))]": "Resource",
+                "34a4fc9c-8817-4c95-8e1b-76e27fbe2699": "f009d98d-028e-48bc-af57-944f3dd9a77c",
+                "Department": "Data & Search",
+                "Environment": "[parameters('environment')]",
+                "ReleaseId": "[parameters('releaseId')]",
+                "Type": "Web Test (Application Insights)"
+            },
+            "properties": {
+                "SyntheticMonitorId": "[variables('pingAPIManagementName')]",
+                "Name": "[variables('pingAPIManagementName')]",
+                "Kind": "ping",
+                "Enabled": true,
+                "Frequency": 300,
+                "Timeout": 30,
+                "Locations": [
+                    {
+                        "Id": "emea-se-sto-edge"
+                    },
+                    {
+                        "Id": "emea-nl-ams-azr"
+                    },
+                    {
+                        "Id": "emea-gb-db3-azr"
+                    },
+                    {
+                        "Id": "emea-fr-pra-edge"
+                    },
+                    {
+                        "Id": "emea-ch-zrh-edge"
+                    }
+                ],
+                "Configuration": {
+                    "WebTest": "[concat('<WebTest Name=\"',variables('pingAPIManagementName'),'\" Enabled=\"True\" Timeout=\"30\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\"><Items><Request Method=\"GET\" Version=\"1.1\" ThinkTime=\"0\" Timeout=\"30\" ParseDependentRequests=\"False\" FollowRedirects=\"True\" RecordResult=\"True\" Cache=\"False\" ResponseTimeGoal=\"0\" Encoding=\"utf-8\" ExpectedHttpStatusCode=\"200\" ExpectedResponseUrl=\"\" ReportingName=\"\" IgnoreHttpStatusCode=\"False\" Url=\"https://',parameters('apiManagementName'),'.azure-api.net/api-health?Subscription-Key=',parameters('apiSubscriptionAvailability'),'\"/></Items></WebTest>')]"
+                }
+            },
+            "dependsOn": [
+            ]
+        },
+        {
+            "comments": "Ping test for Master0.",
+            "type": "microsoft.insights/webtests",
+            "name": "[variables('pingMaster0TestName')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/components/',parameters('applicationInsightsName'))]": "Resource",
+                "34a4fc9c-8817-4c95-8e1b-76e27fbe2699": "f009d98d-028e-48bc-af57-944f3dd9a77c",
+                "Department": "Data & Search",
+                "Environment": "[parameters('environment')]",
+                "ReleaseId": "[parameters('releaseId')]",
+                "Type": "Web Test (Application Insights)"
+            },
+            "properties": {
+                "SyntheticMonitorId": "[variables('pingMaster0TestName')]",
+                "Name": "[variables('pingMaster0TestName')]",
+                "Kind": "ping",
+                "Enabled": true,
+                "Frequency": 300,
+                "Timeout": 30,
+                "Locations": [
+                    {
+                        "Id": "emea-se-sto-edge"
+                    },
+                    {
+                        "Id": "emea-nl-ams-azr"
+                    },
+                    {
+                        "Id": "emea-gb-db3-azr"
+                    },
+                    {
+                        "Id": "emea-fr-pra-edge"
+                    },
+                    {
+                        "Id": "emea-ch-zrh-edge"
+                    }
+                ],
+                "Configuration": {
+                    "WebTest": "[concat('<WebTest Name=\"',variables('pingMaster0TestName'),'\" Enabled=\"True\" Timeout=\"30\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\"><Items><Request Method=\"GET\" Version=\"1.1\" ThinkTime=\"0\" Timeout=\"30\" ParseDependentRequests=\"False\" FollowRedirects=\"True\" RecordResult=\"True\" Cache=\"False\" ResponseTimeGoal=\"0\" Encoding=\"utf-8\" ExpectedHttpStatusCode=\"200\" ExpectedResponseUrl=\"\" ReportingName=\"\" IgnoreHttpStatusCode=\"False\" Url=\"https://',parameters('apiManagementName'),'.azure-api.net/sparql-endpoint/master-0?query=select+%3Fo+%28count%28%3Fs%29+as+%3Fx%29where+%7B%3Fs+a+%3Fo%7D+group+by+%3Fo+order+by+%3Fo&amp;Subscription-Key=',parameters('apiSubscriptionAvailability'),'\"/></Items></WebTest>')]"
+                }
+            },
+            "dependsOn": [
+            ]
+        },
+        {
+            "comments": "Ping test for Master1.",
+            "type": "microsoft.insights/webtests",
+            "name": "[variables('pingMaster1TestName')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/components/',parameters('applicationInsightsName'))]": "Resource",
+                "34a4fc9c-8817-4c95-8e1b-76e27fbe2699": "f009d98d-028e-48bc-af57-944f3dd9a77c",
+                "Department": "Data & Search",
+                "Environment": "[parameters('environment')]",
+                "ReleaseId": "[parameters('releaseId')]",
+                "Type": "Web Test (Application Insights)"
+            },
+            "properties": {
+                "SyntheticMonitorId": "[variables('pingMaster1TestName')]",
+                "Name": "[variables('pingMaster1TestName')]",
+                "Kind": "ping",
+                "Enabled": true,
+                "Frequency": 300,
+                "Timeout": 30,
+                "Locations": [
+                    {
+                        "Id": "emea-se-sto-edge"
+                    },
+                    {
+                        "Id": "emea-nl-ams-azr"
+                    },
+                    {
+                        "Id": "emea-gb-db3-azr"
+                    },
+                    {
+                        "Id": "emea-fr-pra-edge"
+                    },
+                    {
+                        "Id": "emea-ch-zrh-edge"
+                    }
+                ],
+                "Configuration": {
+                    "WebTest": "[concat('<WebTest Name=\"',variables('pingMaster1TestName'),'\" Enabled=\"True\" Timeout=\"30\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\"><Items><Request Method=\"GET\" Version=\"1.1\" ThinkTime=\"0\" Timeout=\"30\" ParseDependentRequests=\"False\" FollowRedirects=\"True\" RecordResult=\"True\" Cache=\"False\" ResponseTimeGoal=\"0\" Encoding=\"utf-8\" ExpectedHttpStatusCode=\"200\" ExpectedResponseUrl=\"\" ReportingName=\"\" IgnoreHttpStatusCode=\"False\" Url=\"https://',parameters('apiManagementName'),'.azure-api.net/sparql-endpoint/master-1?query=select+%3Fo+%28count%28%3Fs%29+as+%3Fx%29where+%7B%3Fs+a+%3Fo%7D+group+by+%3Fo+order+by+%3Fo&amp;Subscription-Key=',parameters('apiSubscriptionAvailability'),'\"/></Items></WebTest>')]"
+                }
+            },
+            "dependsOn": [
+            ]
+        },
+        {
+            "comments": "Alert rule for Id generator",
+            "type": "microsoft.insights/alertrules",
+            "name": "[concat(variables('pingFixedQueryName'),'alert')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/components/',parameters('applicationInsightsName'))]": "Resource",
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/webtests/',variables('pingFixedQueryName'))]": "Resource",
+                "34a4fc9c-8817-4c95-8e1b-76e27fbe2699": "f009d98d-028e-48bc-af57-944f3dd9a77c",
+                "Department": "Data & Search",
+                "Environment": "[parameters('environment')]",
+                "ReleaseId": "[parameters('releaseId')]",
+                "Type": "Alert rule (Application Insights)"
+            },
+            "properties": {
+                "name": "[concat(variables('pingFixedQueryName'),'alert')]",
+                "isEnabled": true,
+                "condition": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.LocationThresholdRuleCondition",
+                    "dataSource": {
+                        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+                        "resourceUri": "[resourceId('microsoft.insights/webtests', variables('pingFixedQueryName'))]",
+                        "metricName": "GSMT_AvRaW"
+                    },
+                    "windowSize": "PT5M",
+                    "failedLocationCount": 3
+                },
+                "action": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+                    "customEmails": []
+                }
+            },
+            "dependsOn": [
+                "[resourceId('microsoft.insights/webtests', variables('pingFixedQueryName'))]"
+            ]
+        },
+        {
+            "comments": "Alert rule for Id generator",
+            "type": "microsoft.insights/alertrules",
+            "name": "[concat(variables('pingSearchAPIName'),'alert')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/components/',parameters('applicationInsightsName'))]": "Resource",
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/webtests/',variables('pingSearchAPIName'))]": "Resource",
+                "34a4fc9c-8817-4c95-8e1b-76e27fbe2699": "f009d98d-028e-48bc-af57-944f3dd9a77c",
+                "Department": "Data & Search",
+                "Environment": "[parameters('environment')]",
+                "ReleaseId": "[parameters('releaseId')]",
+                "Type": "Alert rule (Application Insights)"
+            },
+            "properties": {
+                "name": "[concat(variables('pingSearchAPIName'),'alert')]",
+                "isEnabled": true,
+                "condition": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.LocationThresholdRuleCondition",
+                    "dataSource": {
+                        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+                        "resourceUri": "[resourceId('microsoft.insights/webtests', variables('pingSearchAPIName'))]",
+                        "metricName": "GSMT_AvRaW"
+                    },
+                    "windowSize": "PT5M",
+                    "failedLocationCount": 3
+                },
+                "action": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+                    "customEmails": []
+                }
+            },
+            "dependsOn": [
+                "[resourceId('microsoft.insights/webtests', variables('pingSearchAPIName'))]"
+            ]
+        },
+        {
+            "comments": "Alert rule for Id generator",
+            "type": "microsoft.insights/alertrules",
+            "name": "[concat(variables('pingIdGeneratorName'),'alert')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/components/',parameters('applicationInsightsName'))]": "Resource",
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/webtests/',variables('pingIdGeneratorName'))]": "Resource",
+                "34a4fc9c-8817-4c95-8e1b-76e27fbe2699": "f009d98d-028e-48bc-af57-944f3dd9a77c",
+                "Department": "Data & Search",
+                "Environment": "[parameters('environment')]",
+                "ReleaseId": "[parameters('releaseId')]",
+                "Type": "Alert rule (Application Insights)"
+            },
+            "properties": {
+                "name": "[concat(variables('pingIdGeneratorName'),'alert')]",
+                "isEnabled": true,
+                "condition": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.LocationThresholdRuleCondition",
+                    "dataSource": {
+                        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+                        "resourceUri": "[resourceId('microsoft.insights/webtests', variables('pingIdGeneratorName'))]",
+                        "metricName": "GSMT_AvRaW"
+                    },
+                    "windowSize": "PT5M",
+                    "failedLocationCount": 3
+                },
+                "action": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+                    "customEmails": []
+                }
+            },
+            "dependsOn": [
+                "[resourceId('microsoft.insights/webtests', variables('pingIdGeneratorName'))]"
+            ]
+        },
+        {
+            "comments": "Alert rule for API Management",
+            "type": "microsoft.insights/alertrules",
+            "name": "[concat(variables('pingAPIManagementName'),'alert')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/components/',parameters('applicationInsightsName'))]": "Resource",
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/webtests/',variables('pingAPIManagementName'))]": "Resource",
+                "34a4fc9c-8817-4c95-8e1b-76e27fbe2699": "f009d98d-028e-48bc-af57-944f3dd9a77c",
+                "Department": "Data & Search",
+                "Environment": "[parameters('environment')]",
+                "ReleaseId": "[parameters('releaseId')]",
+                "Type": "Alert rule (Application Insights)"
+            },
+            "properties": {
+                "name": "[concat(variables('pingAPIManagementName'),'alert')]",
+                "isEnabled": true,
+                "condition": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.LocationThresholdRuleCondition",
+                    "dataSource": {
+                        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+                        "resourceUri": "[resourceId('microsoft.insights/webtests', variables('pingAPIManagementName'))]",
+                        "metricName": "GSMT_AvRaW"
+                    },
+                    "windowSize": "PT5M",
+                    "failedLocationCount": 3
+                },
+                "action": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+                    "customEmails": []
+                }
+            },
+            "dependsOn": [
+                "[resourceId('microsoft.insights/webtests', variables('pingAPIManagementName'))]"
+            ]
+        },
+        {
+            "comments": "Alert rule for Master0 ping test",
+            "type": "microsoft.insights/alertrules",
+            "name": "[concat(variables('pingMaster0TestName'),'alert')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/components/',parameters('applicationInsightsName'))]": "Resource",
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/webtests/',variables('pingMaster0TestName'))]": "Resource",
+                "34a4fc9c-8817-4c95-8e1b-76e27fbe2699": "f009d98d-028e-48bc-af57-944f3dd9a77c",
+                "Department": "Data & Search",
+                "Environment": "[parameters('environment')]",
+                "ReleaseId": "[parameters('releaseId')]",
+                "Type": "Alert rule (Application Insights)"
+            },
+            "properties": {
+                "name": "[concat(variables('pingMaster0TestName'),'alert')]",
+                "isEnabled": true,
+                "condition": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.LocationThresholdRuleCondition",
+                    "dataSource": {
+                        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+                        "resourceUri": "[resourceId('microsoft.insights/webtests', variables('pingMaster0TestName'))]",
+                        "metricName": "GSMT_AvRaW"
+                    },
+                    "windowSize": "PT5M",
+                    "failedLocationCount": 3
+                },
+                "action": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+                    "customEmails": []
+                }
+            },
+            "dependsOn": [
+                "[resourceId('microsoft.insights/webtests', variables('pingMaster0TestName'))]"
+            ]
+        },
+        {
+            "comments": "Alert rule for Master1 ping test",
+            "type": "microsoft.insights/alertrules",
+            "name": "[concat(variables('pingMaster1TestName'),'alert')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/components/',parameters('applicationInsightsName'))]": "Resource",
+                "[concat('hidden-link:/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/microsoft.insights/webtests/',variables('pingMaster1TestName'))]": "Resource",
+                "34a4fc9c-8817-4c95-8e1b-76e27fbe2699": "f009d98d-028e-48bc-af57-944f3dd9a77c",
+                "Department": "Data & Search",
+                "Environment": "[parameters('environment')]",
+                "ReleaseId": "[parameters('releaseId')]",
+                "Type": "Alert rule (Application Insights)"
+            },
+            "properties": {
+                "name": "[concat(variables('pingMaster1TestName'),'alert')]",
+                "isEnabled": true,
+                "condition": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.LocationThresholdRuleCondition",
+                    "dataSource": {
+                        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+                        "resourceUri": "[resourceId('microsoft.insights/webtests', variables('pingMaster1TestName'))]",
+                        "metricName": "GSMT_AvRaW"
+                    },
+                    "windowSize": "PT5M",
+                    "failedLocationCount": 3
+                },
+                "action": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+                    "customEmails": []
+                }
+            },
+            "dependsOn": [
+                "[resourceId('microsoft.insights/webtests', variables('pingMaster1TestName'))]"
+            ]
+        }
+    ],
+    "outputs": {}
+}

@@ -1,0 +1,12 @@
+<policies>
+    <inbound>
+        <base/>
+        <set-query-parameter name="Subscription-Key" exists-action="delete"/>
+    </inbound>
+    <backend>
+        <base/>
+    </backend>
+    <outbound>
+        <base/>
+    </outbound>
+</policies>

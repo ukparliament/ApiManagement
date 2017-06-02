@@ -1,0 +1,12 @@
+<policies>
+    <inbound>
+        <base/>
+        <authentication-basic username="{0}" password="{1}"/>
+    </inbound>
+    <backend>
+        <base/>
+    </backend>
+    <outbound>
+        <base/>
+    </outbound>
+</policies>

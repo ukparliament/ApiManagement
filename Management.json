@@ -1,0 +1,73 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "apiManagementName": {
+            "type": "string",
+            "metadata": {
+                "description": "Full name of the Virtual Network."
+            }
+        },
+        "networkResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Resource Group where the cluster networking is."
+            }
+        },
+        "apiPublisherEmail": {
+            "type": "string",
+            "metadata": {
+                "description": "E-mail address of the publisher."
+            }
+        },
+        "virtualNetworkPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Prefix of the Virtual Network."
+            }
+        },
+        "environment": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the environment that is being deployed to."
+            }
+        },
+        "releaseId": {
+            "type": "int",
+            "metadata": {
+                "description": "The identifier of the current release record."
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "API Management",
+            "type": "Microsoft.ApiManagement/service",
+            "name": "[parameters('apiManagementName')]",
+            "apiVersion": "2016-10-10",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "34a4fc9c-8817-4c95-8e1b-76e27fbe2699": "f009d98d-028e-48bc-af57-944f3dd9a77c",
+                "Department": "Data & Search",
+                "Environment": "[parameters('environment')]",
+                "ReleaseId": "[parameters('releaseId')]",
+                "Type": "API Management"
+            },
+            "sku": {
+                "name": "Developer",
+                "capacity": 1
+            },
+            "properties": {
+                "vpnType": "External",
+                "publisherEmail": "[parameters('apiPublisherEmail')]",
+                "publisherName": "UK Parliament",
+                "vpnconfiguration":{
+                    "location": "[resourceGroup().location]",
+                    "subnetResourceId": "[resourceId(subscription().subscriptionId,parameters('networkResourceGroupName'),'Microsoft.Network/virtualNetworks/subnets',concat(parameters('virtualNetworkPrefix'),'1'),'subnetapimanagement')]"
+                }
+            },
+            "dependsOn": []
+        }
+    ]
+}

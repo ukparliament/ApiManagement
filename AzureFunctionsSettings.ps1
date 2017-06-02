@@ -18,7 +18,7 @@ This script is for use as a part of deployment in VSTS only.
 Param(
     [Parameter(Mandatory=$true)] [string] $APIResourceGroupName,
     [Parameter(Mandatory=$true)] [string] $APIManagementName,
-    [Parameter(Mandatory=$true)] [string] $AzureFunctionsResourceGroupName,
+    [Parameter(Mandatory=$true)] [string] $OrchestrationResourceGroupName,
     [Parameter(Mandatory=$true)] [string] $AzureFunctionsName
     
 )
@@ -37,7 +37,7 @@ $subscription=Get-AzureRmApiManagementSubscription -Context $management -Product
 $subscriptionKey=$subscription.PrimaryKey
 
 Log "Gets current settings"
-$webApp = Get-AzureRmwebApp -ResourceGroupName $AzureFunctionsResourceGroupName -Name $AzureFunctionsName
+$webApp = Get-AzureRmwebApp -ResourceGroupName $OrchestrationResourceGroupName -Name $AzureFunctionsName
 $webAppSettings = $webApp.SiteConfig.AppSettings
 $settings=@{}
 foreach($set in $webAppSettings){ 
@@ -46,6 +46,6 @@ foreach($set in $webAppSettings){
 
 Log "Sets new subscription key"
 $settings["SubscriptionKey"]=$subscriptionKey
-Set-AzureRmWebApp -ResourceGroupName $AzureFunctionsResourceGroupName -Name $AzureFunctionsName -AppSettings $settings
+Set-AzureRmWebApp -ResourceGroupName $OrchestrationResourceGroupName -Name $AzureFunctionsName -AppSettings $settings
 
 Log "Job well done!"

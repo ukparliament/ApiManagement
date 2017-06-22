@@ -163,7 +163,7 @@ $allProducts=@(
     }
     New-Object -TypeName PSObject -Property @{
         "ProductName"="Parliament - Orchestration";
-        "APIs"=@($apiRDF4J[0].ApiId,$apiIdGenerate.ApiId)
+        "APIs"=@($apiGraphStore.ApiId,$apiIdGenerate.ApiId)
     }
     New-Object -TypeName PSObject -Property @{
         "ProductName"="Parliament - Availability";

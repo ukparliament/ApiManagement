@@ -1,0 +1,19 @@
+<policies>
+  <inbound>
+    <base/>
+    <cache-lookup vary-by-developer="false" vary-by-developer-groups="false">
+      <vary-by-header>Accept</vary-by-header>
+      <vary-by-header>Accept-Charset</vary-by-header>
+    </cache-lookup>
+  </inbound>
+  <backend>
+    <base/>
+  </backend>
+  <outbound>
+    <base/>
+    <cache-store duration="1800"/>
+  </outbound>
+  <on-error>
+    <base/>
+  </on-error>
+</policies>

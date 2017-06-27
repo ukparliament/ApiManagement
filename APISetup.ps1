@@ -60,7 +60,9 @@ Log "Create APIs"
 
 Log "Fixed Query"
 $apiFixedQuery=New-AzureRmApiManagementApi -Context $management -Name "Fixed Query" -ServiceUrl "https://$FixedQueryName.azurewebsites.net/" -Protocols @("https") -Path "/fixed-query"
-New-AzureRmApiManagementOperation -Context $management -ApiId $apiFixedQuery.ApiId -Name "Get" -Method "GET" -UrlTemplate "/*"
+$operationFixedQuery=New-AzureRmApiManagementOperation -Context $management -ApiId $apiFixedQuery.ApiId -Name "Get" -Method "GET" -UrlTemplate "/*"
+$fixedQueryGETPolicy=Get-Content -Path "$PoliciesFolderLocation\FixedQueryGET.xml" -Raw
+Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiFixedQuery.ApiId -OperationId $operationFixedQuery.OperationId -Policy $fixedQueryGETPolicy
 
 Log "Search"
 $apiSearch=New-AzureRmApiManagementApi -Context $management -Name "Search" -ServiceUrl "https://$SearchAPIName.azurewebsites.net/" -Protocols @("https") -Path "/search"

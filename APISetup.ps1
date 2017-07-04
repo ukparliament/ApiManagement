@@ -61,8 +61,7 @@ Log "Create APIs"
 Log "Fixed Query"
 $apiFixedQuery=New-AzureRmApiManagementApi -Context $management -Name "Fixed Query" -ServiceUrl "https://$FixedQueryName.azurewebsites.net/" -Protocols @("https") -Path "/fixed-query"
 $operationFixedQuery=New-AzureRmApiManagementOperation -Context $management -ApiId $apiFixedQuery.ApiId -Name "Get" -Method "GET" -UrlTemplate "/*"
-$fixedQueryGETPolicy=Get-Content -Path "$PoliciesFolderLocation\FixedQueryGET.xml" -Raw
-Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiFixedQuery.ApiId -OperationId $operationFixedQuery.OperationId -Policy $fixedQueryGETPolicy
+Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiFixedQuery.ApiId -OperationId $operationFixedQuery.OperationId -PolicyFilePath "$PoliciesFolderLocation\FixedQueryGET.xml"
 
 Log "Search"
 $apiSearch=New-AzureRmApiManagementApi -Context $management -Name "Search" -ServiceUrl "https://$SearchAPIName.azurewebsites.net/" -Protocols @("https") -Path "/search"
@@ -89,17 +88,15 @@ $requestSearchGET=New-Object -TypeName Microsoft.Azure.Commands.ApiManagement.Se
     )
 }
 $operationSearch2=New-AzureRmApiManagementOperation -Context $management -ApiId $apiSearch.ApiId -Name "Search" -Method "GET" -UrlTemplate "/" -Request $requestSearchGET
-$searchGETPolicy=Get-Content -Path "$PoliciesFolderLocation\SearchGET.xml" -Raw
-Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiSearch.ApiId -OperationId $operationSearch2.OperationId -Policy $searchGETPolicy
+Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiSearch.ApiId -OperationId $operationSearch2.OperationId -PolicyFilePath "$PoliciesFolderLocation\SearchGET.xml"
 
 $apiSPARQL=@()
-$sparqlPOST=Get-Content -Path "$PoliciesFolderLocation\SPARQLEndpointPOST.xml" -Raw
 for($i=0;$i -lt 2;$i++) {
     Log "Read-only SPARQL Endpoint Master $i"
     $apiSPARQLN=New-AzureRmApiManagementApi -Context $management -Name "Read-only SPARQL Endpoint $i" -ServiceUrl "http://10.$($graphDBsubnetIP2ndGroups[$i]).$GraphDBsubnetIP3rdGroup.30/repositories/Master" -Protocols @("https") -Path "/sparql-endpoint/master-$i"
     New-AzureRmApiManagementOperation -Context $management -ApiId $apiSPARQLN.ApiId -Name "Get" -Method "GET" -UrlTemplate "/*"
     $operationSPARQL=New-AzureRmApiManagementOperation -Context $management -ApiId $apiSPARQLN.ApiId -Name "Post" -Method "POST" -UrlTemplate "/"
-    Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiSPARQLN.ApiId -OperationId $operationSPARQL.OperationId -Policy $sparqlPOST
+    Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiSPARQLN.ApiId -OperationId $operationSPARQL.OperationId -PolicyFilePath "$PoliciesFolderLocation\SPARQLEndpointPOST.xml"
     $apiSPARQL+=$apiSPARQLN
 }
 
@@ -113,14 +110,12 @@ New-AzureRmApiManagementOperation -Context $management -ApiId $apiGraphStore.Api
 Log "API Health"
 $apiHealth=New-AzureRmApiManagementApi -Context $management -Name "API Health" -ServiceUrl "https://$APIManagementName.portal.azure-api.net" -Protocols @("https") -Path "/api-health"
 $operationAPIHealth=New-AzureRmApiManagementOperation -Context $management -ApiId $apiHealth.ApiId -Name "Get" -Method "GET" -UrlTemplate "/*"
-$apiHealthGET=Get-Content -Path "$PoliciesFolderLocation\APIHealthGET.xml" -Raw
-Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiHealth.ApiId -OperationId $operationAPIHealth.OperationId -Policy $apiHealthGET
+Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiHealth.ApiId -OperationId $operationAPIHealth.OperationId -PolicyFilePath "$PoliciesFolderLocation\APIHealthGET.xml"
 
 Log "Id Generator"
 $apiIdGenerate=New-AzureRmApiManagementApi -Context $management -Name "Id Generator" -ServiceUrl $idGeneratorUrl -Protocols @("https") -Path "/id/generate"
 $operationIdGenerate=New-AzureRmApiManagementOperation -Context $management -ApiId $apiIdGenerate.ApiId -Name "Get" -Method "GET" -UrlTemplate "/"
-$idGenerateGET=Get-Content -Path "$PoliciesFolderLocation\IdGenerateGET.xml" -Raw
-Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiIdGenerate.ApiId -OperationId $operationIdGenerate.OperationId -Policy $idGenerateGET
+Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiIdGenerate.ApiId -OperationId $operationIdGenerate.OperationId -PolicyFilePath "$PoliciesFolderLocation\IdGenerateGET.xml"
 
 $apiJMX=@()
 $requestJMXN=New-Object -TypeName Microsoft.Azure.Commands.ApiManagement.ServiceManagement.Models.PsApiManagementRequest -Property @{
@@ -189,6 +184,11 @@ foreach ($product in $allProducts){
         Add-AzureRmApiManagementApiToProduct -Context $management -ProductId $apiProduct.ProductId -ApiId $api
     }
 }
+
+Log "Add public Fixed Query product"
+$apiProduct=New-AzureRmApiManagementProduct -Context $management -Title "Public - Fixed Query" -Description "For limited public use." -ApprovalRequired $false -SubscriptionRequired $false
+Add-AzureRmApiManagementApiToProduct -Context $management -ProductId $apiProduct.ProductId -ApiId $apiFixedQuery.ApiId
+Set-AzureRmApiManagementPolicy -Context $management -ProductId $apiProduct.ProductId -PolicyFilePath "$PoliciesFolderLocation\FixedQueryPublic.xml"
 
 $apiProductAvailability=Get-AzureRmApiManagementProduct -Context $management -Title "Parliament - Availability"
 

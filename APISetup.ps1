@@ -170,10 +170,6 @@ $allProducts=@(
         "ProductName"="Parliament - Release";
         "APIs"=@($apiIdGenerate.ApiId,$apiRDF4J[0].ApiId,$apiRDF4J[1].ApiId,$apiJMX[0].ApiId,$apiJMX[1].ApiId)
     }
-    New-Object -TypeName PSObject -Property @{
-        "ProductName"="Parliament - Workbench";
-        "APIs"=@($apiRDF4J[0].ApiId)
-    }
 )
 
 foreach ($product in $allProducts){
@@ -189,6 +185,12 @@ Log "Add public Fixed Query product"
 $apiProduct=New-AzureRmApiManagementProduct -Context $management -Title "Public - Fixed Query" -Description "For limited public use." -ApprovalRequired $false -SubscriptionRequired $false
 Add-AzureRmApiManagementApiToProduct -Context $management -ProductId $apiProduct.ProductId -ApiId $apiFixedQuery.ApiId
 Set-AzureRmApiManagementPolicy -Context $management -ProductId $apiProduct.ProductId -PolicyFilePath "$PoliciesFolderLocation\FixedQueryPublic.xml"
+
+Log "Add Workbench product"
+$apiProduct=New-AzureRmApiManagementProduct -Context $management -Title "Parliament - Workbench" -Description "For parliamentary use only." -ApprovalRequired $false -SubscriptionRequired $false
+Add-AzureRmApiManagementApiToProduct -Context $management -ProductId $apiProduct.ProductId -ApiId $apiRDF4J[0].ApiId
+$workbenchPolicy=Get-Content -Path "$PoliciesFolderLocation\WorkbenchParliament.xml" -Raw
+Set-AzureRmApiManagementPolicy -Context $management -ProductId $apiProduct.ProductId -Policy ($workbenchPolicy -f [Guid]::NewGuid())
 
 $apiProductAvailability=Get-AzureRmApiManagementProduct -Context $management -Title "Parliament - Availability"
 

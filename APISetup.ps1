@@ -20,6 +20,7 @@ Param(
     [Parameter(Mandatory=$true)] [string] $OrchestrationResourceGroupName,
     [Parameter(Mandatory=$true)] [string] $AzureFunctionsName,
     [Parameter(Mandatory=$true)] [string] $FixedQueryName,
+	[Parameter(Mandatory=$true)] [string] $PhotoAPIName,
     [Parameter(Mandatory=$true)] [string] $SearchAPIName,
     [Parameter(Mandatory=$true)] [string] $APIManagementName,
 	[Parameter(Mandatory=$true)] [string] $JMXUserName,
@@ -62,6 +63,11 @@ Log "Fixed Query"
 $apiFixedQuery=New-AzureRmApiManagementApi -Context $management -Name "Fixed Query" -ServiceUrl "https://$FixedQueryName.azurewebsites.net/" -Protocols @("https") -Path "/fixed-query"
 $operationFixedQuery=New-AzureRmApiManagementOperation -Context $management -ApiId $apiFixedQuery.ApiId -Name "Get" -Method "GET" -UrlTemplate "/*"
 Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiFixedQuery.ApiId -OperationId $operationFixedQuery.OperationId -PolicyFilePath "$PoliciesFolderLocation\FixedQueryGET.xml"
+
+Log "Photo"
+$apiPhoto=New-AzureRmApiManagementApi -Context $management -Name "Photo" -ServiceUrl "https://$PhotoAPIName.azurewebsites.net/" -Protocols @("https") -Path "/photo"
+$operationPhoto=New-AzureRmApiManagementOperation -Context $management -ApiId $apiPhoto.ApiId -Name "Get" -Method "GET" -UrlTemplate "/*"
+Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiPhoto.ApiId -OperationId $operationPhoto.OperationId -PolicyFilePath "$PoliciesFolderLocation\PhotoGET.xml"
 
 Log "Search"
 $apiSearch=New-AzureRmApiManagementApi -Context $management -Name "Search" -ServiceUrl "https://$SearchAPIName.azurewebsites.net/" -Protocols @("https") -Path "/search"
@@ -152,45 +158,64 @@ Log "Create new API Products"
 $allProducts=@(
     New-Object -TypeName PSObject -Property @{
         "ProductName"="Parliament - Beta website";
+		"HasSubscription"=$true;
         "APIs"=@($apiFixedQuery.ApiId,$apiSearch.ApiId);
     }
     New-Object -TypeName PSObject -Property @{
         "ProductName"="Parliament - Fixed Query";
+		"HasSubscription"=$true;
         "APIs"=@($apiSPARQL[0].ApiId)
     }
     New-Object -TypeName PSObject -Property @{
         "ProductName"="Parliament - Orchestration";
+		"HasSubscription"=$true;
         "APIs"=@($apiGraphStore.ApiId,$apiIdGenerate.ApiId)
     }
     New-Object -TypeName PSObject -Property @{
         "ProductName"="Parliament - Availability";
+		"HasSubscription"=$true;
         "APIs"=@($apiIdGenerate.ApiId,$apiSearch.ApiId,$apiSPARQL[0].ApiId,$apiSPARQL[1].ApiId,$apiHealth.ApiId,$apiFixedQuery.ApiId)
     }
     New-Object -TypeName PSObject -Property @{
         "ProductName"="Parliament - Release";
+		"HasSubscription"=$true;
         "APIs"=@($apiIdGenerate.ApiId,$apiRDF4J[0].ApiId,$apiRDF4J[1].ApiId,$apiJMX[0].ApiId,$apiJMX[1].ApiId)
+    }
+	New-Object -TypeName PSObject -Property @{
+        "ProductName"="Public - Fixed Query";
+		"HasSubscription"=$false;
+		"PolicyXML"=(Get-Content -Path "$PoliciesFolderLocation\FixedQueryPublic.xml" -Raw)
+        "APIs"=@($apiFixedQuery.ApiId)
+    }
+	New-Object -TypeName PSObject -Property @{
+        "ProductName"="Parliament - Workbench";
+		"HasSubscription"=$false;
+		"PolicyXML"=((Get-Content -Path "$PoliciesFolderLocation\WorkbenchParliament.xml" -Raw) -f [Guid]::NewGuid());
+        "APIs"=@($apiRDF4J[0].ApiId)
+    }
+	New-Object -TypeName PSObject -Property @{
+        "ProductName"="Public - Photo";
+		"HasSubscription"=$false;
+        "APIs"=@($apiPhoto.ApiId)
     }
 )
 
 foreach ($product in $allProducts){
     Log "Create $($product.ProductName)"
-    $apiProduct=New-AzureRmApiManagementProduct -Context $management -Title $product.ProductName -Description "For parliamentary use only." -ApprovalRequired $true -SubscriptionsLimit 1 -SubscriptionRequired $true
+	if ($product.HasSubscription -eq $true) {
+		$apiProduct=New-AzureRmApiManagementProduct -Context $management -Title $product.ProductName -Description "For parliamentary use only." -ApprovalRequired $true -SubscriptionsLimit 1 -SubscriptionRequired $true
+	}
+	else {
+		$apiProduct=New-AzureRmApiManagementProduct -Context $management -Title $product.ProductName -Description "For parliamentary use only." -ApprovalRequired $false -SubscriptionRequired $false
+	}
+	if ($product.PolicyXML) {
+		Set-AzureRmApiManagementPolicy -Context $management -ProductId $apiProduct.ProductId -Policy $product.PolicyXML
+	}
     foreach ($api in $product.APIs) {
         Log "Add API $api"
         Add-AzureRmApiManagementApiToProduct -Context $management -ProductId $apiProduct.ProductId -ApiId $api
     }
 }
-
-Log "Add public Fixed Query product"
-$apiProduct=New-AzureRmApiManagementProduct -Context $management -Title "Public - Fixed Query" -Description "For limited public use." -ApprovalRequired $false -SubscriptionRequired $false
-Add-AzureRmApiManagementApiToProduct -Context $management -ProductId $apiProduct.ProductId -ApiId $apiFixedQuery.ApiId
-Set-AzureRmApiManagementPolicy -Context $management -ProductId $apiProduct.ProductId -PolicyFilePath "$PoliciesFolderLocation\FixedQueryPublic.xml"
-
-Log "Add Workbench product"
-$apiProduct=New-AzureRmApiManagementProduct -Context $management -Title "Parliament - Workbench" -Description "For parliamentary use only." -ApprovalRequired $false -SubscriptionRequired $false
-Add-AzureRmApiManagementApiToProduct -Context $management -ProductId $apiProduct.ProductId -ApiId $apiRDF4J[0].ApiId
-$workbenchPolicy=Get-Content -Path "$PoliciesFolderLocation\WorkbenchParliament.xml" -Raw
-Set-AzureRmApiManagementPolicy -Context $management -ProductId $apiProduct.ProductId -Policy ($workbenchPolicy -f [Guid]::NewGuid())
 
 $apiProductAvailability=Get-AzureRmApiManagementProduct -Context $management -Title "Parliament - Availability"
 

@@ -1,7 +1,9 @@
 <policies>
     <inbound>
         <base/>
-        <rate-limit calls="30" renewal-period="300"/>
+        <rate-limit-by-key calls="10" renewal-period="1" 
+                           increment-condition="@(context.Response.StatusCode == 200)" 
+                           counter-key="@(context.Request.IpAddress)"/>
     </inbound>
     <backend>
         <base/>

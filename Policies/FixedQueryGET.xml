@@ -1,7 +1,7 @@
 <policies>
   <inbound>
     <base/>
-    <cache-lookup vary-by-developer="false" vary-by-developer-groups="false">
+    <cache-lookup vary-by-developer="false" vary-by-developer-groups="false" downstream-caching-type="public">
       <vary-by-header>Accept</vary-by-header>
       <vary-by-header>Accept-Charset</vary-by-header>
     </cache-lookup>

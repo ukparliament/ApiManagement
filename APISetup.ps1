@@ -194,6 +194,11 @@ $allProducts=@(
         "APIs"=@($apiRDF4J[0].ApiId)
     }
 	New-Object -TypeName PSObject -Property @{
+        "ProductName"="Parliament - Photo";
+		"HasSubscription"=$true;
+        "APIs"=@($apiSPARQL[0].ApiId)
+    }
+	New-Object -TypeName PSObject -Property @{
         "ProductName"="Public - Photo";
 		"HasSubscription"=$false;
         "APIs"=@($apiPhoto.ApiId)

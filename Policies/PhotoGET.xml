@@ -5,9 +5,9 @@
       <vary-by-header>Accept</vary-by-header>
       <vary-by-header>Accept-Charset</vary-by-header>
     </cache-lookup>
-    <rate-limit-by-key calls="10" renewal-period="1"
-                           increment-condition="@(context.Response.StatusCode == 200)"
-                           counter-key="@(context.Request.IpAddress)"/>
+    <rate-limit-by-key calls="60" renewal-period="1"
+      increment-condition="@(context.Response.StatusCode == 200)"
+      counter-key="@(context.Request.IpAddress)"/>
   </inbound>
   <backend>
     <base/>

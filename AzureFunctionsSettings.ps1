@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Generates API.
+Sets subscription key parameter in Azure Functions.
 
 .DESCRIPTION
-Creates endpoints to access GraphDB.
+Sets subscription key parameter in Azure Functions.
 
 .PARAMETER APIResourceGroupName
 Name of the Resource Group where the API Management is.
@@ -19,7 +19,8 @@ Param(
     [Parameter(Mandatory=$true)] [string] $APIResourceGroupName,
     [Parameter(Mandatory=$true)] [string] $APIManagementName,
     [Parameter(Mandatory=$true)] [string] $OrchestrationResourceGroupName,
-    [Parameter(Mandatory=$true)] [string] $AzureFunctionsName
+    [Parameter(Mandatory=$true)] [string] $AzureFunctionsName,
+	[Parameter(Mandatory=$true)][AllowEmptyString()] [string] $APIPrefix
     
 )
 
@@ -32,7 +33,7 @@ function Log([Parameter(Mandatory=$true)][string]$LogText){
 Log "Get API Management context"
 $management=New-AzureRmApiManagementContext -ResourceGroupName $APIResourceGroupName -ServiceName $APIManagementName
 Log "Retrives subscription"
-$apiProductOrchestration=Get-AzureRmApiManagementProduct -Context $management -Title "Parliament - Orchestration"
+$apiProductOrchestration=Get-AzureRmApiManagementProduct -Context $management -Title "$($APIPrefix)Parliament - Orchestration"
 $subscription=Get-AzureRmApiManagementSubscription -Context $management -ProductId $apiProductOrchestration.ProductId
 $subscriptionKey=$subscription.PrimaryKey
 

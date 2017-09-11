@@ -61,7 +61,7 @@ for($i=0;$i -lt 2;$i++) {
 
 Log "Graph Store"
 $serviceUrl="http://10.$($graphDBsubnetIP2ndGroups[0]).$GraphDBsubnetIP3rdGroup.30/"
-$apiGraphStore=Get-AzureRmApiManagementApi -Context $management | where where {($_.ServiceUrl -EQ $serviceUrl) -and ($_.Name -match "Store")}
+$apiGraphStore=Get-AzureRmApiManagementApi -Context $management | where {($_.ServiceUrl -EQ $serviceUrl) -and ($_.Name -match "Store")}
 
 Log "API Health"
 $serviceUrl="https://$APIManagementName.portal.azure-api.net"

@@ -68,7 +68,11 @@ $serviceUrl="https://$APIManagementName.portal.azure-api.net"
 $apiHealth=Get-AzureRmApiManagementApi -Context $management | where ServiceUrl -EQ $serviceUrl
 
 Log "Id Generator"
-$apiIdGenerate=Get-AzureRmApiManagementApi -Context $management | where ServiceUrl -EQ $idGeneratorUrl
+$path="id/generate"
+if ($APIPrefix -ne "") {
+	$path="$APIPrefix/$path"
+}
+$apiIdGenerate=Get-AzureRmApiManagementApi -Context $management | where Path -EQ $path
 
 $apiJMX=@()
 for($i=0;$i -lt 2;$i++) {

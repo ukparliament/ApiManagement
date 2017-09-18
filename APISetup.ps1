@@ -54,11 +54,7 @@ Log "Fixed Query"
 $serviceUrl="https://$FixedQueryName.azurewebsites.net/"
 $apiFixedQuery=Get-AzureRmApiManagementApi -Context $management | where ServiceUrl -EQ $serviceUrl
 if ($apiFixedQuery -eq $null) {
-	$path="fixed-query"
-	$existingApi=Get-AzureRmApiManagementApi -Context $management | where Path -EQ $path
-	if ($existingApi -ne $null) {
-		$path="$APIPrefix/$path"
-	}
+	$path="$APIPrefix/fixed-query"
 	$apiFixedQuery=New-AzureRmApiManagementApi -Context $management -Name "$APIPrefix - Fixed Query" -ServiceUrl $serviceUrl -Protocols @("https") -Path "/$path"
 	$operationFixedQuery=New-AzureRmApiManagementOperation -Context $management -ApiId $apiFixedQuery.ApiId -Name "Get" -Method "GET" -UrlTemplate "/*"
 	Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiFixedQuery.ApiId -OperationId $operationFixedQuery.OperationId -PolicyFilePath "$PoliciesFolderLocation\FixedQueryGET.xml"
@@ -68,11 +64,7 @@ Log "Photo"
 $serviceUrl="https://$PhotoAPIName.azurewebsites.net/"
 $apiPhoto=Get-AzureRmApiManagementApi -Context $management | where ServiceUrl -EQ $serviceUrl
 if ($apiPhoto -eq $null) {
-	$path="photo"
-	$existingApi=Get-AzureRmApiManagementApi -Context $management | where Path -EQ $path
-	if ($existingApi -ne $null) {
-		$path="$APIPrefix/$path"
-	}
+	$path="$APIPrefix/photo"
 	$apiPhoto=New-AzureRmApiManagementApi -Context $management -Name "$APIPrefix - Photo" -ServiceUrl $serviceUrl -Protocols @("https") -Path "/$path"
 	$operationPhoto=New-AzureRmApiManagementOperation -Context $management -ApiId $apiPhoto.ApiId -Name "Get" -Method "GET" -UrlTemplate "/*"
 	Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiPhoto.ApiId -OperationId $operationPhoto.OperationId -PolicyFilePath "$PoliciesFolderLocation\PhotoGET.xml"
@@ -82,11 +74,7 @@ Log "Search"
 $serviceUrl="https://$SearchAPIName.azurewebsites.net/"
 $apiSearch=Get-AzureRmApiManagementApi -Context $management | where ServiceUrl -EQ $serviceUrl
 if ($apiSearch -eq $null) {
-	$path="search"
-	$existingApi=Get-AzureRmApiManagementApi -Context $management | where Path -EQ $path
-	if ($existingApi -ne $null) {
-		$path="$APIPrefix/$path"
-	}
+	$path="$APIPrefix/search"
 	$apiSearch=New-AzureRmApiManagementApi -Context $management -Name "$APIPrefix - Search" -ServiceUrl $serviceUrl -Protocols @("https") -Path "/$path"
 	$operationSearch1=New-AzureRmApiManagementOperation -Context $management -ApiId $apiSearch.ApiId -Name "Description" -Method "GET" -UrlTemplate "/description"
 	$searchDescriptionGETPolicy=Get-Content -Path "$PoliciesFolderLocation\SearchDescriptionGET.xml" -Raw

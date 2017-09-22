@@ -4,7 +4,7 @@
                            failed-check-httpcode="401"
                            failed-check-error-message="Authentication required"
                            ignore-case="true">
-                 <value>{0}</value>
+                 <value>Basic {0}</value>
              </check-header>        
         <base/>
     </inbound>

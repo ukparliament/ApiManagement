@@ -170,7 +170,7 @@ if ($apiRDF4J -eq $null) {
 }
 
 Log "Create new API Products"
-
+New-AzureRmApiManagementProperty -Context $management -Name "$APIPrefix-WorkbenchAuthorization" -Value ([Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes([Guid]::NewGuid()))) -Secret
 $allProducts=@(
     New-Object -TypeName PSObject -Property @{
 		"Id"="Website";
@@ -213,7 +213,7 @@ $allProducts=@(
 		"Id"="Workbench";
         "ProductName"="$APIPrefix - Parliament [Workbench]";
 		"HasSubscription"=$false;
-		"PolicyXML"=((Get-Content -Path "$PoliciesFolderLocation\WorkbenchParliament.xml" -Raw) -f [Guid]::NewGuid());
+		"PolicyXML"=((Get-Content -Path "$PoliciesFolderLocation\WorkbenchParliament.xml" -Raw) -f "{{$APIPrefix-WorkbenchAuthorization}}");
         "APIs"=@($apiRDF4J.ApiId)
     }
 	New-Object -TypeName PSObject -Property @{

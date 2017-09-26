@@ -38,7 +38,7 @@ if ($apiHealth -eq $null) {
 }
 
 Log "Create API product"
-$apiProduct=New-AzureRmApiManagementProduct -Context $management -Title "Parliament - API Availability" -Description "For parliamentary use only." -ApprovalRequired $true -SubscriptionsLimit 1 -SubscriptionRequired $true
+$apiProduct=New-AzureRmApiManagementProduct -Context $management -Title "API Management - Parliament [Availability]" -Description "For parliamentary use only." -ApprovalRequired $true -SubscriptionsLimit 1 -SubscriptionRequired $true
 Add-AzureRmApiManagementApiToProduct -Context $management -ProductId $apiProduct.ProductId -ApiId $apiHealth.ApiId
 
 Log "Job well done!"

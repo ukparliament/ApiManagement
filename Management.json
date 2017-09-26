@@ -1,62 +1,91 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "apiManagementName": {
-            "type": "string",
-            "metadata": {
-                "description": "Full name of the Virtual Network."
-            }
-        },
-        "networkResourceGroupName": {
-            "type": "string",
-            "metadata": {
-                "description": "Name of the Resource Group where the cluster networking is."
-            }
-        },
-        "apiPublisherEmail": {
-            "type": "string",
-            "metadata": {
-                "description": "E-mail address of the publisher."
-            }
-        },
-        "virtualNetworkName": {
-            "type": "string",
-            "metadata": {
-                "description": "Name of the Virtual Network."
-            }
-        },
-        "releaseId": {
-            "type": "int",
-            "metadata": {
-                "description": "The identifier of the current release record."
-            }
-        }
-    },
-    "variables": {},
-    "resources": [
-      {
-        "comments": "API Management",
-        "type": "Microsoft.ApiManagement/service",
-        "name": "[parameters('apiManagementName')]",
-        "apiVersion": "2017-03-01",
-        "location": "[resourceGroup().location]",
-        "tags": {
-          "ReleaseId": "[parameters('releaseId')]"
-        },
-        "sku": {
-          "name": "Developer",
-          "capacity": 1
-        },
-        "properties": {
-          "virtualNetworkType": "External",
-          "publisherEmail": "[parameters('apiPublisherEmail')]",
-          "publisherName": "UK Parliament",
-          "virtualNetworkConfiguration": {
-            "subnetResourceId": "[resourceId(subscription().subscriptionId,parameters('networkResourceGroupName'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),'api')]"
-          }
-        },
-        "dependsOn": []
+  "parameters": {
+    "apiManagementName": {
+      "type": "string",
+      "metadata": {
+        "description": "Full name of the API Management (api)."
       }
-    ]
+    },
+    "apiIdManagementName": {
+      "type": "string",
+      "metadata": {
+        "description": "Full name of the API Management (id)."
+      }
+    },
+    "networkResourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Resource Group where the cluster networking is."
+      }
+    },
+    "apiPublisherEmail": {
+      "type": "string",
+      "metadata": {
+        "description": "E-mail address of the publisher."
+      }
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Virtual Network."
+      }
+    },
+    "releaseId": {
+      "type": "int",
+      "metadata": {
+        "description": "The identifier of the current release record."
+      }
+    }
+  },
+    "variables": {},
+  "resources": [
+    {
+      "comments": "API Management (api)",
+      "type": "Microsoft.ApiManagement/service",
+      "name": "[parameters('apiManagementName')]",
+      "apiVersion": "2017-03-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "ReleaseId": "[parameters('releaseId')]"
+      },
+      "sku": {
+        "name": "Developer",
+        "capacity": 1
+      },
+      "properties": {
+        "virtualNetworkType": "External",
+        "publisherEmail": "[parameters('apiPublisherEmail')]",
+        "publisherName": "UK Parliament",
+        "virtualNetworkConfiguration": {
+          "subnetResourceId": "[resourceId(subscription().subscriptionId,parameters('networkResourceGroupName'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),'api')]"
+        }
+      },
+      "dependsOn": []
+    },
+    {
+      "comments": "API Management (id)",
+      "type": "Microsoft.ApiManagement/service",
+      "name": "[parameters('apiIdManagementName')]",
+      "apiVersion": "2017-03-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "ReleaseId": "[parameters('releaseId')]"
+      },
+      "sku": {
+        "name": "Developer",
+        "capacity": 1
+      },
+      "properties": {
+        "virtualNetworkType": "External",
+        "publisherEmail": "[parameters('apiPublisherEmail')]",
+        "publisherName": "UK Parliament",
+        "virtualNetworkConfiguration": {
+          "subnetResourceId": "[resourceId(subscription().subscriptionId,parameters('networkResourceGroupName'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),'id')]"
+        }
+      },
+      "dependsOn": []
+    }
+  ]
 }

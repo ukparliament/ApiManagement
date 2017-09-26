@@ -20,7 +20,6 @@ Param(
     [Parameter(Mandatory=$true)] [string] $APIManagementName
 )
 $ErrorActionPreference = "Stop"
-$graphDBsubnetIP2ndGroups=$(0,128)
 
 function Log([Parameter(Mandatory=$true)][string]$LogText){
     Write-Host ("{0} - {1}" -f (Get-Date -Format "HH:mm:ss.fff"), $LogText)

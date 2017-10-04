@@ -34,7 +34,7 @@ Log "Remove $APIPrefix"
 $products=Get-AzureRmApiManagementProduct -Context $management | Where-Object Title -Match "$APIPrefix -" 
 foreach ($product in $products){
 	Log $product.Title
-	$subscription=Get-AzureRmApiManagementSubscription -Context $management -ProductId $api.ProductId
+	$subscription=Get-AzureRmApiManagementSubscription -Context $management -ProductId $product.ProductId
 	Remove-AzureRmApiManagementSubscription -Context $management -SubscriptionId $subscription.SubscriptionId
 	Remove-AzureRmApiManagementProduct -Context $management -ProductId $product.ProductId
 }

@@ -12,5 +12,5 @@ can publish data in a variety of formats which is requested by the caller.  A fe
 
 The full list of supported formats can be queried from the APIs.
 
-Associated with APIs are policies which govern their use; publicly facing APIs are governed by a policy to restrict their use
-to avoid a DoS attack while internal use of APIs is unrestricted.
+Associated with APIs are policies to govern their use; publicly facing APIs are governed by a policies to
+provide a caching opption or restrict their use to avoid a DoS attack while for internal use access can be more unrestricted.

@@ -31,6 +31,7 @@ $management=New-AzureRmApiManagementContext -ResourceGroupName $APIResourceGroup
 
 Log "Remove $APIPrefix"
 
+Log "Remove Products"
 $products=Get-AzureRmApiManagementProduct -Context $management | Where-Object Title -Match "$APIPrefix -" 
 foreach ($product in $products){
 	Log $product.Title
@@ -39,10 +40,18 @@ foreach ($product in $products){
 	Remove-AzureRmApiManagementProduct -Context $management -ProductId $product.ProductId
 }
 
+Log "Remove APIs"
 $apis=Get-AzureRmApiManagementApi -Context $management | Where-Object Name -Match "$APIPrefix -" 
 foreach ($api in $apis){
 	Log $api.Name
 	Remove-AzureRmApiManagementApi -Context $management -ApiId $api.ApiId
+}
+
+Log "Remove Named Values"
+$properties=Get-AzureRmApiManagementProperty -Context $management | Where-Object Name -Match "$APIPrefix-" 
+foreach ($property in $properties){
+	Log $property.Name
+	Remove-AzureRmApiManagementProperty -Context $management -PropertyId $property.PropertyId
 }
 
 Log "Job well done!"

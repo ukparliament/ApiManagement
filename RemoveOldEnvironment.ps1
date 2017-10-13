@@ -18,7 +18,8 @@ This script is for use as a part of deployment in VSTS only.
 Param(
     [Parameter(Mandatory=$true)] [string] $APIResourceGroupName,
     [Parameter(Mandatory=$true)] [string] $APIManagementName,
-	[Parameter(Mandatory=$true)] [string] $APIPrefix
+	[Parameter(Mandatory=$true)] [string] $APIPrefix,
+	[Parameter(Mandatory=$true)] [string] $GenericName
 )
 $ErrorActionPreference = "Stop"
 
@@ -53,5 +54,15 @@ foreach ($property in $properties){
 	Log $property.Name
 	Remove-AzureRmApiManagementProperty -Context $management -PropertyId $property.PropertyId
 }
+
+$appNames=@("fixedquery","search","photo")
+Log "Remove web apps"
+foreach ($name in $appNames) {
+	Log "$name"
+	Remove-AzureRmWebApp -ResourceGroupName "$APIResourceGroupName" -Name "$name$GenericName"
+}
+
+Log "Remove app service"
+Remove-AzureRmAppServicePlan -ResourceGroupName "$APIResourceGroupName" -Name "apps$GenericName" -Force
 
 Log "Job well done!"

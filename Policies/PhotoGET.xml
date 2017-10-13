@@ -1,10 +1,6 @@
 <policies>
   <inbound>
     <base/>
-    <cache-lookup vary-by-developer="false" vary-by-developer-groups="false" downstream-caching-type="public">
-      <vary-by-header>Accept</vary-by-header>
-      <vary-by-header>Accept-Charset</vary-by-header>
-    </cache-lookup>
     <rate-limit-by-key calls="60" renewal-period="1"
       increment-condition="@(context.Response.StatusCode == 200)"
       counter-key="@(context.Request.IpAddress)"/>
@@ -14,7 +10,6 @@
   </backend>
   <outbound>
     <base/>
-    <cache-store duration="1800"/>
   </outbound>
   <on-error>
     <base/>

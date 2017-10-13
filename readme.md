@@ -15,10 +15,10 @@ contains references to the `person_by_id` fixed query APIs in the HTML, like so:
 
 * `<link href="https://api.parliament.uk/Live/fixed-query/person_by_id?person_id=bpM8fJmB" rel="alternate" type="text/turtle">`
 
-The `type` parameters specify the format so similar lines to this one show the other formats available.
+The `type` parameters specify the format so similar lines show the other formats available.
 
-Associated with APIs are policies governing their use.  Publicly facing APIs can have policies which:
-* provide caching
-* restrict their use to avoid an external DoS attack.
+Associated with APIs are policies governing their use.  Publicly facing APIs may include:
+* caching;
+* restrictions on their use to avoid a DoS attack.
 
 For internal use there are no such restrictions.

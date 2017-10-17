@@ -221,7 +221,7 @@ $allProducts=@(
 		"Id"="Photo";
         "ProductName"="$APIPrefix - Parliament [Photo]";
 		"HasSubscription"=$true;
-        "APIs"=@($apiSPARQL.ApiId)
+        "APIs"=@($apiFixedQuery.ApiId)
     }
 	New-Object -TypeName PSObject -Property @{
 		"Id"="PublicPhoto";

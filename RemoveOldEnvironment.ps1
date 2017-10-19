@@ -59,7 +59,7 @@ $appNames=@("fixedquery","search","photo")
 Log "Remove web apps"
 foreach ($name in $appNames) {
 	Log "$name"
-	Remove-AzureRmWebApp -ResourceGroupName "$APIResourceGroupName" -Name "$name$GenericName"
+	Remove-AzureRmWebApp -ResourceGroupName "$APIResourceGroupName" -Name "$name$GenericName" -Force
 }
 
 Log "Remove app service"

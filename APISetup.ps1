@@ -171,7 +171,7 @@ if ($apiRDF4J -eq $null) {
 
 Log "Create new API Products"
 $workbenchPassword=[Guid]::NewGuid()
-New-AzureRmApiManagementProperty -Context $management -Name "$APIPrefix-WorkbenchAuthorization" -Value ([Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes("workbench:$workbenchPassword"))) -Secret
+New-AzureRmApiManagementProperty -Context $management -Name "$APIPrefix-WorkbenchAuthorization" -Value ([Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("workbench:$workbenchPassword"))) -Secret
 $allProducts=@(
     New-Object -TypeName PSObject -Property @{
 		"Id"="Website";

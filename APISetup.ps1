@@ -21,6 +21,7 @@ Param(
     [Parameter(Mandatory=$true)] [string] $AzureFunctionsName,
     [Parameter(Mandatory=$true)] [string] $FixedQueryName,
 	[Parameter(Mandatory=$true)] [string] $PhotoAPIName,
+	[Parameter(Mandatory=$true)] [string] $ODataAPIName,
     [Parameter(Mandatory=$true)] [string] $SearchAPIName,
     [Parameter(Mandatory=$true)] [string] $APIManagementName,
 	[Parameter(Mandatory=$true)] [string] $JMXUserName,
@@ -68,6 +69,16 @@ if ($apiPhoto -eq $null) {
 	$apiPhoto=New-AzureRmApiManagementApi -Context $management -Name "$APIPrefix - Photo" -ServiceUrl $serviceUrl -Protocols @("https") -Path "/$path"
 	$operationPhoto=New-AzureRmApiManagementOperation -Context $management -ApiId $apiPhoto.ApiId -Name "Get" -Method "GET" -UrlTemplate "/*"
 	Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiPhoto.ApiId -OperationId $operationPhoto.OperationId -PolicyFilePath "$PoliciesFolderLocation\PhotoGET.xml"
+}
+
+Log "OData"
+$serviceUrl="https://$ODataAPIName.azurewebsites.net/"
+$apiOData=Get-AzureRmApiManagementApi -Context $management | where ServiceUrl -EQ $serviceUrl
+if ($apiOData -eq $null) {
+	$path="$APIPrefix/odata"
+	$apiOData=New-AzureRmApiManagementApi -Context $management -Name "$APIPrefix - OData" -ServiceUrl $serviceUrl -Protocols @("https") -Path "/$path"
+	$operationOData=New-AzureRmApiManagementOperation -Context $management -ApiId $apiOData.ApiId -Name "Get" -Method "GET" -UrlTemplate "/*"
+	Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiOData.ApiId -OperationId $operationOData.OperationId -PolicyFilePath "$PoliciesFolderLocation\ODataGET.xml"
 }
 
 Log "Search"
@@ -228,6 +239,18 @@ $allProducts=@(
         "ProductName"="$APIPrefix - Public [Photo]";
 		"HasSubscription"=$false;
         "APIs"=@($apiPhoto.ApiId)
+    }
+	New-Object -TypeName PSObject -Property @{
+		"Id"="OData";
+        "ProductName"="$APIPrefix - Parliament [OData]";
+		"HasSubscription"=$true;
+        "APIs"=@($apiSPARQL.ApiId)
+    }
+	New-Object -TypeName PSObject -Property @{
+		"Id"="PublicOData";
+        "ProductName"="$APIPrefix - Public [OData]";
+		"HasSubscription"=$false;
+        "APIs"=@($apiOData.ApiId)
     }
 )
 

@@ -1,0 +1,26 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "humans.txt",
+    "version": "1.0"
+  },
+  "host": "api.parliament.uk",
+  "basePath": "/humans.txt",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "/",
+        "responses": {
+          "responses": {
+            "200": {
+              "description": "The request has succeeded"
+            }
+          }
+        }
+      }
+    }
+  }
+}

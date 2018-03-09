@@ -1,0 +1,18 @@
+<policies>
+  <inbound>
+    <base />
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+    <set-header name="x-ms-blob-type" exists-action="delete" />
+    <set-header name="x-ms-lease-status" exists-action="delete" />
+    <set-header name="x-ms-request-id" exists-action="delete" />
+    <set-header name="x-ms-version" exists-action="delete" />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

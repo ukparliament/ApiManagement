@@ -1,0 +1,26 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Historic Hansard",
+    "version": "1.0"
+  },
+  "host": "api.parliament.uk",
+  "basePath": "/historic-hansard",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/*": {
+      "get": {
+        "operationId": "Get all",
+        "responses": {
+          "responses": {
+            "200": {
+              "description": "The request has succeeded"
+            }
+          }
+        }
+      }
+    }
+  }
+}

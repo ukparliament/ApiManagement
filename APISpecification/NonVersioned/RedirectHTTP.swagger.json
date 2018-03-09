@@ -1,0 +1,26 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Redirect HTTP",
+    "version": "1.0"
+  },
+  "host": "api.parliament.uk",
+  "basePath": "",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/*": {
+      "get": {
+        "operationId": "Get",
+        "responses": {
+          "responses": {
+            "301": {
+              "description": "Moved Permanently"
+            }
+          }
+        }
+      }
+    }
+  }
+}

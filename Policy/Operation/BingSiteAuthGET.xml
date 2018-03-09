@@ -1,0 +1,18 @@
+<policies>
+  <inbound>
+    <base />
+    <return-response>
+      <set-status code="200" reason="OK" />
+      <set-body>@(new System.Xml.Linq.XElement("users", new System.Xml.Linq.XElement("user", "3F3244B0975B69CBCF4F8790A61EBE8B")).ToString())</set-body>
+    </return-response>
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

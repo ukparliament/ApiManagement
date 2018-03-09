@@ -1,0 +1,27 @@
+<policies>
+  <inbound>
+    <cors>
+      <allowed-origins>
+        <origin>*</origin>
+        <!-- allow any -->
+      </allowed-origins>
+      <allowed-methods>
+        <!-- allow any -->
+        <method>*</method>
+      </allowed-methods>
+      <allowed-headers>
+        <!-- allow any -->
+        <header>*</header>
+      </allowed-headers>
+    </cors>
+  </inbound>
+  <backend>
+    <forward-request />
+  </backend>
+  <outbound>
+    <set-header name="Strict-Transport-Security" exists-action="skip">
+      <value>max-age=31536000</value>
+    </set-header>
+  </outbound>
+  <on-error />
+</policies>

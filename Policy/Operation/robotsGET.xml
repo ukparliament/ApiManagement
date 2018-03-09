@@ -1,0 +1,23 @@
+<policies>
+  <inbound>
+    <base />
+    <return-response>
+      <set-status code="200" reason="OK" />
+      <set-body>
+        User-agent: *
+        Disallow: /
+        Allow: /Live/photo
+        Allow: /photo
+      </set-body>
+    </return-response>
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

@@ -1,0 +1,15 @@
+<policies>
+  <inbound>
+    <base />
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+    <find-and-replace from="{0}.azurewebsites.net" to="api.parliament.uk" />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

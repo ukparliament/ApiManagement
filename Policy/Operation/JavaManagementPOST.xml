@@ -1,0 +1,15 @@
+<policies>
+  <inbound>
+    <base />
+    <authentication-basic username="admin" password="{0}-MasterJolokiaSecret" />
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

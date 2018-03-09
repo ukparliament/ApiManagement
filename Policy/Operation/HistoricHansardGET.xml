@@ -1,0 +1,49 @@
+<policies>
+  <inbound>
+    <base />
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+    <choose>
+      <when condition="@(context.Request.OriginalUrl.ToString().EndsWith(&quot;/historic-hansard&quot;))">
+        <set-body />
+        <set-status code="301" reason="Moved Permanently" />
+        <set-header name="Location" exists-action="override">
+          <value>@(context.Request.OriginalUrl.ToString().Replace("/historic-hansard", "/historic-hansard/index.html"))</value>
+        </set-header>
+      </when>
+      <when condition="@(context.Response.StatusCode == 400 &amp;&amp; context.Request.OriginalUrl.ToString().EndsWith(&quot;/&quot;))">
+        <set-body />
+        <set-status code="301" reason="Moved Permanently" />
+        <set-header name="Location" exists-action="override">
+          <value>@(context.Request.OriginalUrl + "index.html")</value>
+        </set-header>
+      </when>
+      <when condition="@(context.Response.StatusCode == 404 &amp;&amp; !context.Request.OriginalUrl.ToString().EndsWith(&quot;/&quot;))">
+        <set-body />
+        <set-status code="301" reason="Moved Permanently" />
+        <set-header name="Location" exists-action="override">
+          <value>@(context.Request.OriginalUrl + "/index.html")</value>
+        </set-header>
+      </when>
+      <otherwise>
+        <find-and-replace from="href=&quot;/" to="href=&quot;/historic-hansard/" />
+        <find-and-replace from="href=&apos;/" to="href=&apos;/historic-hansard/" />
+        <find-and-replace from="src=&quot;/" to="src=&quot;/historic-hansard/" />
+        <find-and-replace from="http://www.parliament.uk/site_information/parliamentary_copyright.cfm" to="https://www.parliament.uk/site-information/copyright/" />
+        <find-and-replace from="data_files" to="data-files" />
+        <find-and-replace from="grand_committee_report" to="grand-committee-report" />
+        <find-and-replace from="lords_reports" to="lords-reports" />
+        <find-and-replace from="source_files" to="source-files" />
+        <find-and-replace from="westminster_hall" to="westminster-hall" />
+        <find-and-replace from="written_answers" to="written-answers" />
+      </otherwise>
+    </choose>
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

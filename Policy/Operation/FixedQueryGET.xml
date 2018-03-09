@@ -1,19 +1,20 @@
 <policies>
   <inbound>
-    <base/>
+    <base />
     <cache-lookup vary-by-developer="false" vary-by-developer-groups="false" downstream-caching-type="public">
       <vary-by-header>Accept</vary-by-header>
+      <vary-by-header>Accept-Charset</vary-by-header>
       <vary-by-header>Accept-Encoding</vary-by-header>
     </cache-lookup>
   </inbound>
   <backend>
-    <base/>
+    <base />
   </backend>
   <outbound>
-    <base/>
-    <cache-store duration="1800"/>
+    <base />
+    <cache-store duration="1800" />
   </outbound>
   <on-error>
-    <base/>
+    <base />
   </on-error>
 </policies>

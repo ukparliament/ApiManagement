@@ -10,7 +10,30 @@
     <base />
   </backend>
   <outbound>
-    <base />
+    <set-variable name="id" value="@(context.Response.Body.As&lt;string&gt;())" />
+        <choose>
+            <when condition="@(context.Request.Headers.GetValueOrDefault(&quot;Accept&quot;,&quot;text/plain&quot;).ToLower().Contains(&quot;application/json&quot;))">
+                <return-response>
+                    <set-header name="Content-Type" exists-action="override">
+                        <value>appliaction/json</value>
+                    </set-header>
+                    <set-body>@{
+                            string body="{\"id\":";
+                            body+=((string)context.Variables["id"]);
+                            body+="}";
+                            return body;
+                        }</set-body>
+                </return-response>
+            </when>
+            <otherwise>
+                <return-response>
+                    <set-header name="Content-Type" exists-action="override">
+                        <value>text/plain</value>
+                    </set-header>
+                    <set-body>@((string)context.Variables["id"])</set-body>
+                </return-response>
+            </otherwise>
+        </choose>
   </outbound>
   <on-error>
     <base />

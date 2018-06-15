@@ -30,11 +30,11 @@ Log "Get API Management context"
 $management=New-AzureRmApiManagementContext -ResourceGroupName $APIResourceGroupName -ServiceName $APIManagementName
 
 Log "Detects generic name for $APIPrefix"
-$apiFixedQuery=Get-AzureRmApiManagementApi -Context $management | Where-Object Name -EQ "$APIPrefix - Fixed Query"
+$apiFixedQuery=Get-AzureRmApiManagementApi -Context $management | Where-Object {($_.ApiVersion -EQ "$APIPrefix") -and ($_.Name -EQ "Fixed Query")}
 $genericName=$apiFixedQuery.ServiceUrl.Substring(18,$apiFixedQuery.ServiceUrl.IndexOf('.')-18)
 
 Log "Detects IP's 3rd group for $APIPrefix"
-$apiGraphStore=Get-AzureRmApiManagementApi -Context $management | Where-Object Name -EQ "$APIPrefix - Graph Store"
+$apiGraphStore=Get-AzureRmApiManagementApi -Context $management | Where-Object {($_.ApiVersion -EQ "$APIPrefix") -and ($_.Name -EQ "RDF4J")}
 $graphDBsubnetIP3rdGroup=$apiGraphStore.ServiceUrl.Split('.')[2]
 
 Log "Setting variables to use during deployment"

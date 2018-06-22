@@ -21,12 +21,14 @@ function Log([Parameter(Mandatory=$true)][string]$LogText){
     Write-Host ("{0} - {1}" -f (Get-Date -Format "HH:mm:ss.fff"), $LogText)
 }
 
+Log "Read files"
 $odataApi=Get-Content $ODataFileLocation | ConvertFrom-Json
 $queryApi=Get-Content $QueryFileLocation | ConvertFrom-Json
 $photoApi=Get-Content $PhotoFileLocation | ConvertFrom-Json
 
 $api= New-Object -TypeName PSCustomObject
 
+Log "Add paths"
 Add-Member -InputObject $api -Name "paths" -Value (New-Object -TypeName PSCustomObject) -MemberType NoteProperty
 function Set-OperationPath([Parameter(Mandatory=$true)]$Source) {
     $basePath=[System.Uri]::new($Source.servers[0].url).AbsolutePath
@@ -39,6 +41,7 @@ Set-OperationPath -Source $odataApi
 Set-OperationPath -Source $photoApi
 Set-OperationPath -Source $queryApi 
 
+Log "Add components"
 Add-Member -InputObject $api -Name "components" -Value (New-Object -TypeName PSCustomObject) -MemberType NoteProperty
 function Set-Component([Parameter(Mandatory=$true)]$Source) {
     foreach($propertyName in @("responses","parameters")) {        
@@ -57,6 +60,7 @@ Set-Component -Source $odataApi
 Set-Component -Source $photoApi
 Set-Component -Source $queryApi 
 
+Log "Set top level information"
 Add-Member -InputObject $api -Name "openapi" -Value $odataApi.openapi -MemberType NoteProperty
 Add-Member -InputObject $api -Name "info" -Value $odataApi.info -MemberType NoteProperty
 Add-Member -InputObject $api -Name "servers" -Value $odataApi.servers -MemberType NoteProperty

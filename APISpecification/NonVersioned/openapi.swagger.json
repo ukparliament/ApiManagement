@@ -1,0 +1,22 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "openapi.json",
+        "version": "1.0"
+    },
+    "host": "api.parliament.uk",
+    "basePath": "/openapi.json",
+    "schemes": [
+        "https"
+    ],
+    "paths": {
+        "/": {
+            "get": {
+                "operationId": "get",
+                "summary": "Get",
+                "responses": {}
+            }
+        }
+    },
+    "tags": []
+}

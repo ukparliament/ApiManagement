@@ -30,6 +30,12 @@
     }
   ],
   "paths": {
+    "/openapi.json": {
+      "get": {
+        "operationId": "openapi-json",
+        "responses": {}
+      }
+    },
     "/description": {
       "get": {
         "operationId": "Description",

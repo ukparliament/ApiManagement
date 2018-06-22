@@ -1,0 +1,109 @@
+<policies>
+  <inbound>
+    <return-response>
+      <set-status code="200" reason="OK" />
+      <set-header name="Content-Type" exists-action="override">
+        <value>application/json</value>
+      </set-header>
+      <set-body>
+        {
+        "openapi": "3.0.1",
+        "info": {
+        "title": "UK Parliament API",
+        "description": "Publicly available API",
+        "contact": {
+        "name": "Data &amp; Search team at UK Parliament",
+        "email": "data@parliament.uk"
+        },
+        "license": {
+        "name": "Open Parliament Licence",
+        "url": "https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence"
+        },
+        "version": "Live"
+        },
+        "servers": [{
+        "url": "https://api.parliament.uk"
+        }
+        ],
+        "paths": {
+        "/odata/openapi.json": {
+        "get": {
+        "summary": "OpenApi document",
+        "externalDocs": {
+        "description": "OpenApi documentation",
+        "url": "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md"
+        },
+        "responses": {
+        "200": {
+        "description": "OpenApi document describing (OData)[https://api.parliament.uk/odata] endpoints",
+        "content": {
+        "application/json": {}
+        }
+        }
+        }
+        }
+        },
+        "/photo/openapi.json": {
+        "get": {
+        "summary": "OpenApi document",
+        "externalDocs": {
+        "description": "OpenApi documentation",
+        "url": "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md"
+        },
+        "responses": {
+        "200": {
+        "description": "OpenApi document describing (Photo Api)[https://api.parliament.uk/photo] endpoints",
+        "content": {
+        "application/json": {}
+        }
+        }
+        }
+        }
+        },
+        "/query/openapi.json": {
+        "get": {
+        "summary": "OpenApi document",
+        "externalDocs": {
+        "description": "OpenApi documentation",
+        "url": "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md"
+        },
+        "responses": {
+        "200": {
+        "description": "OpenApi document describing (Query Api)[https://api.parliament.uk/query] endpoints",
+        "content": {
+        "application/json": {}
+        }
+        }
+        }
+        }
+        },
+        "/search/openapi.json": {
+        "get": {
+        "summary": "OpenApi document",
+        "externalDocs": {
+        "description": "OpenApi documentation",
+        "url": "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md"
+        },
+        "responses": {
+        "200": {
+        "description": "OpenApi document describing (Search Api)[https://api.parliament.uk/search] endpoints",
+        "content": {
+        "application/json": {}
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+      </set-body>
+    </return-response>
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound />
+  <on-error>
+    <base />
+  </on-error>
+</policies>

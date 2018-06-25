@@ -25,6 +25,10 @@
         "url": "https://api.parliament.uk"
         }
         ],
+        "externalDocs":{
+        "description":"UK Parliament API fundamentals",
+        "url":"https://medium.com/@langsamu/api-parliament-uk-7b87597019a4"
+        },
         "paths": {
         "/odata/openapi.json": {
         "get": {
@@ -97,6 +101,10 @@
         "/{id}": {
         "get": {
         "summary": "Lookup for resources being part of https://id.parliament.uk namespace",
+        "externalDocs":{
+        "description": "W3C Cool URIs for the Semantic Web",
+        "url":"https://www.w3.org/TR/cooluris/#r303gendocument"
+        },
         "parameters": [{
         "name": "id",
         "in": "path",
@@ -110,6 +118,9 @@
         "Ontology":{
         "value":"schema"
         },
+        "Ontology document":{
+        "value":"schema/"
+        },
         "Class of Houses of Parliament":{
         "value":"schema/House"
         }
@@ -120,21 +131,22 @@
         }
         ],
         "responses": {
-        "200": {
-        "description": "Dereferenced resource to a canonical representation",
+        "302": {
+        "description": "Ontology base uri redirect"
+        },
+        "303": {
+        "description": "Dereferenced resource to a canonical representation"
+        },
+        "400":{
+        "description": "Bad request",
         "content": {
-        "application/n-triples": {},
-        "text/turtle": {},
-        "text/vnd.graphviz": {},
-        "application/rdf+xml": {},
-        "application/xml": {},
-        "text/xml": {},
-        "application/json+ld": {},
-        "application/json": {},
-        "application/json+rdf": {},
-        "text/html": {},
-        "application/xhtml+xml": {},
-        "application/graphml+xml": {}
+        "text/plain": {}
+        }
+        },
+        "404":{
+        "description": "Not found",
+        "content": {
+        "text/plain": {}
         }
         }
         },

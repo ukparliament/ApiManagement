@@ -93,6 +93,56 @@
         }
         }
         }
+        },
+        "/{id}": {
+        "get": {
+        "summary": "Lookup for resources being part of https://id.parliament.uk namespace",
+        "parameters": [{
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Resource",
+        "example":"1AFu55Hs",
+        "examples":{
+        "Resource Id": {
+        "value":"1AFu55Hs"
+        },
+        "Ontology":{
+        "value":"schema"
+        },
+        "Class of Houses of Parliament":{
+        "value":"schema/House"
+        }
+        },
+        "schema": {
+        "type": "string"
+        }
+        }
+        ],
+        "responses": {
+        "200": {
+        "description": "Dereferenced resource to a canonical representation",
+        "content": {
+        "application/n-triples": {},
+        "text/turtle": {},
+        "text/vnd.graphviz": {},
+        "application/rdf+xml": {},
+        "application/xml": {},
+        "text/xml": {},
+        "application/json+ld": {},
+        "application/json": {},
+        "application/json+rdf": {},
+        "text/html": {},
+        "application/xhtml+xml": {},
+        "application/graphml+xml": {}
+        }
+        }
+        },
+        "servers": [{
+        "url": "https://id.parliament.uk"
+        }
+        ]
+        }
         }
         }
         }

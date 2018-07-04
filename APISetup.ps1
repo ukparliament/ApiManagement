@@ -24,9 +24,7 @@ Param(
 	[Parameter(Mandatory=$true)] [string] $ODataAPIName,
     [Parameter(Mandatory=$true)] [string] $SearchAPIName,
     [Parameter(Mandatory=$true)] [string] $APIManagementName,
-	[Parameter(Mandatory=$true)] [string] $JMXUserName,
-    [Parameter(Mandatory=$true)] [string] $MasterJolokiaSecret,
-    [Parameter(Mandatory=$true)] [int] $GraphDBsubnetIP3rdGroup,
+	[Parameter(Mandatory=$true)] [int] $GraphDBsubnetIP3rdGroup,
     [Parameter(Mandatory=$true)] [string] $PoliciesFolderLocation,
 	[Parameter(Mandatory=$true)] [string] $APIPrefix
 )
@@ -156,7 +154,6 @@ $requestJMX=New-Object -TypeName Microsoft.Azure.Commands.ApiManagement.ServiceM
         }
     )
 }
-$jmxPOSTPolicy=Get-Content -Path "$PoliciesFolderLocation\JavaManagementPOST.xml" -Raw
 Log "Java Management GraphDB Master"
 $serviceUrl="http://10.0.$GraphDBsubnetIP3rdGroup.30/jolokia"
 $apiJMX=Get-AzureRmApiManagementApi -Context $management | where ServiceUrl -EQ $serviceUrl
@@ -164,9 +161,6 @@ if ($apiJMX -eq $null) {
 	$path="$APIPrefix/jolokia/master"
 	$apiJMX=New-AzureRmApiManagementApi -Context $management -Name "$APIPrefix - Java Management GraphDB Master" -ServiceUrl $serviceUrl -Protocols @("https") -Path "/$path"
 	$operationJMX=New-AzureRmApiManagementOperation -Context $management -ApiId $apiJMX.ApiId -Name "Post" -Method "POST" -UrlTemplate "/" -Request $requestJMX
-	New-AzureRmApiManagementProperty -Context $management -Name "$APIPrefix-JMXUserName" -Value "$JMXUserName" -Secret
-	New-AzureRmApiManagementProperty -Context $management -Name "$APIPrefix-MasterJolokiaSecret" -Value "$MasterJolokiaSecret" -Secret
-	Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiJMX.ApiId -OperationId $operationJMX.OperationId -Policy ($jmxPOSTPolicy -f "{{$APIPrefix-JMXUserName}}", "{{$APIPrefix-MasterJolokiaSecret}}")
 }
     
 

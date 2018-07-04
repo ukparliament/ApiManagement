@@ -25,7 +25,7 @@ $ErrorActionPreference = "Stop"
 
 $genericNameAPINames=@("Fixed Query","Id Generator","Photo","Search")
 $ip3rdGroupAPINames=@("Graph Store","Java Management GraphDB Master","RDF4J Master","Read-only SPARQL Endpoint")
-$namedValuesNames=@("IdGeneratorKey","JMXUserName","MasterJolokiaSecret","WorkbenchAuthorization")
+$namedValuesNames=@("IdGeneratorKey","WorkbenchAuthorization")
 
 function Log([Parameter(Mandatory=$true)][string]$LogText){
     Write-Host ("{0} - {1}" -f (Get-Date -Format "HH:mm:ss.fff"), $LogText)

@@ -1,171 +1,197 @@
 <policies>
-  <inbound>
-    <return-response>
-      <set-status code="200" reason="OK" />
-      <set-header name="Content-Type" exists-action="override">
-        <value>application/json</value>
-      </set-header>
-      <set-body>
+    <inbound>
+        <return-response>
+            <set-status code="200" reason="OK" />
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/json</value>
+            </set-header>
+            <set-body>{
+	"openapi": "3.0.1",
+	"info": {
+		"title": "UK Parliament API",
+		"description": "This application programming interface exposes authoritative information about the Parliament of the United Kingdom as permissively licensed, standards-compliant, machine-readable linked data.",
+		"contact": {
+			"name": "Data &amp; Search team at UK Parliament",
+			"email": "data@parliament.uk",
+            "url": "https://twitter.com/UKParliData"
+		},
+		"license": {
+			"name": "Open Parliament Licence",
+			"url": "https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence"
+		},
+		"version": "Live"
+	},
+	"externalDocs": {
+		"description": "UK Parliament API fundamentals",
+		"url": "https://medium.com/@langsamu/api-parliament-uk-7b87597019a4"
+	},
+	"servers": [
         {
-        "openapi": "3.0.1",
-        "info": {
-        "title": "UK Parliament API",
-        "description": "Publicly available API",
-        "contact": {
-        "name": "Data &amp; Search team at UK Parliament",
-        "email": "data@parliament.uk"
-        },
-        "license": {
-        "name": "Open Parliament Licence",
-        "url": "https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence"
-        },
-        "version": "Live"
-        },
-        "servers": [{
-        "url": "https://api.parliament.uk"
-        }
-        ],
-        "externalDocs":{
-        "description":"UK Parliament API fundamentals",
-        "url":"https://medium.com/@langsamu/api-parliament-uk-7b87597019a4"
-        },
-        "paths": {
-        "/odata/openapi.json": {
-        "get": {
-        "summary": "OpenApi document",
-        "externalDocs": {
-        "description": "OpenApi documentation",
-        "url": "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md"
-        },
-        "responses": {
-        "200": {
-        "description": "OpenApi document describing (OData)[https://api.parliament.uk/odata] endpoints",
-        "content": {
-        "application/json": {}
-        }
-        }
-        }
-        }
-        },
-        "/photo/openapi.json": {
-        "get": {
-        "summary": "OpenApi document",
-        "externalDocs": {
-        "description": "OpenApi documentation",
-        "url": "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md"
-        },
-        "responses": {
-        "200": {
-        "description": "OpenApi document describing (Photo Api)[https://api.parliament.uk/photo] endpoints",
-        "content": {
-        "application/json": {}
-        }
-        }
-        }
-        }
-        },
-        "/query/openapi.json": {
-        "get": {
-        "summary": "OpenApi document",
-        "externalDocs": {
-        "description": "OpenApi documentation",
-        "url": "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md"
-        },
-        "responses": {
-        "200": {
-        "description": "OpenApi document describing (Query Api)[https://api.parliament.uk/query] endpoints",
-        "content": {
-        "application/json": {}
-        }
-        }
-        }
-        }
-        },
+			"url": "https://api.parliament.uk"
+		}
+	],
+	"paths": {
+		"/odata/openapi.json": {
+            "summary": "OData Service OpenAPI Document",
+			"get": {
+				"externalDocs": {
+					"description": "OpenAPI Specification",
+					"url": "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md"
+				},
+				"responses": {
+					"200": {
+						"description": "An OpenAPI document describing the (UK Parliament OData Service)[https://api.parliament.uk/odata].",
+						"content": {
+							"application/json": {}
+						}
+					}
+				}
+			}
+		},
+		"/photo/openapi.json": {
+            "summary": "Photo Service OpenAPI Document",
+			"get": {
+				"externalDocs": {
+					"description": "OpenAPI Specification",
+					"url": "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md"
+				},
+				"responses": {
+					"200": {
+						"description": "An OpenAPI document describing the (UK Parliament Photo Service)[https://api.parliament.uk/photo].",
+						"content": {
+							"application/json": {}
+						}
+					}
+				}
+			}
+		},
+		"/query/openapi.json": {
+            "summary": "Query Service OpenAPI Document",
+			"get": {
+				"externalDocs": {
+					"description": "OpenAPI Specification",
+					"url": "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md"
+				},
+				"responses": {
+					"200": {
+						"description": "An OpenApi document describing the (UK Parliament Query Service)[https://api.parliament.uk/query].",
+						"content": {
+							"application/json": {}
+						}
+					}
+				}
+			}
+		},
         "/search/openapi.json": {
-        "get": {
-        "summary": "OpenApi document",
-        "externalDocs": {
-        "description": "OpenApi documentation",
-        "url": "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md"
-        },
-        "responses": {
-        "200": {
-        "description": "OpenApi document describing (Search Api)[https://api.parliament.uk/search] endpoints",
-        "content": {
-        "application/json": {}
-        }
-        }
-        }
-        }
-        },
-        "/{id}": {
-        "get": {
-        "summary": "Lookup for resources being part of https://id.parliament.uk namespace",
-        "externalDocs":{
-        "description": "W3C Cool URIs for the Semantic Web",
-        "url":"https://www.w3.org/TR/cooluris/#r303gendocument"
-        },
-        "parameters": [{
-        "name": "id",
-        "in": "path",
-        "required": true,
-        "description": "Resource",
-        "example":"1AFu55Hs",
-        "examples":{
-        "Resource Id": {
-        "value":"1AFu55Hs"
-        },
-        "Ontology":{
-        "value":"schema"
-        },
-        "Ontology document":{
-        "value":"schema/"
-        },
-        "Class of Houses of Parliament":{
-        "value":"schema/House"
-        }
-        },
-        "schema": {
-        "type": "string"
-        }
-        }
-        ],
-        "responses": {
-        "302": {
-        "description": "Ontology base uri redirect"
-        },
-        "303": {
-        "description": "Dereferenced resource to a canonical representation"
-        },
-        "400":{
-        "description": "Bad request",
-        "content": {
-        "text/plain": {}
-        }
-        },
-        "404":{
-        "description": "Not found",
-        "content": {
-        "text/plain": {}
-        }
-        }
-        },
-        "servers": [{
-        "url": "https://id.parliament.uk"
-        }
-        ]
-        }
-        }
-        }
-        }
-      </set-body>
-    </return-response>
-  </inbound>
-  <backend>
-    <base />
-  </backend>
-  <outbound />
-  <on-error>
-    <base />
-  </on-error>
+            "summary": "Search Service OpenAPI Document",
+			"get": {
+				"externalDocs": {
+					"description": "OpenAPI Specification",
+					"url": "https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md"
+				},
+				"responses": {
+					"200": {
+						"description": "An OpenAPI Document describing the (UK Parliament Search Service)[https://api.parliament.uk/search].",
+						"content": {
+							"application/json": {}
+						}
+					}
+				}
+			}
+		},
+		"/{id}": {
+            "summary": "Dereference Service",
+            "description": "This service resolves identifiers of known UK Parliament resources to documents about those resources.",
+            "servers": [
+                {
+                    "url": "https://id.parliament.uk"
+                }
+            ],
+			"get": {
+				"externalDocs": {
+                    "description": "W3C Cool URIs for the Semantic Web",
+                    "url":"https://www.w3.org/TR/cooluris/#r303gendocument"
+                },
+				"parameters": [
+                    {
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"description": "Local part of identifier",
+						"example": "1AFu55Hs",
+						"examples": {
+							"House of Commons": {
+								"value":"1AFu55Hs"
+							},
+							"Ontology": {
+								"value": "schema"
+							},
+							"Ontology document": {
+								"value": "schema/"
+							},
+							"Class of Houses of Parliament": {
+								"value": "schema/House"
+							}
+						},
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"303": {
+						"description": "See Other redirect to a resource lookup endpoint on the Query Service that outputs a content-negotiated canonical representation of the resource.",
+                        "headers": [
+                            {
+                                "Location": {
+                                    "description": "URL of resource lookup endpoint parametrised with this URI",
+                                    "schema": {
+                                        "type": "string",
+                                        "format": "uri"
+                                    }
+                                }
+                            }
+                        ]
+					},
+					"302": {
+						"description": "Found redirect for ontology base URI (only for https://id.parliament.uk/schema).",
+                        "headers": [
+                            {
+                                "Location": {
+                                    "description": "URL of ontology document endpoint on the Query Service",
+                                    "schema": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "default": "https://api.parliament.uk/query/schema"
+                                    }
+                                }
+                            }
+                        ]
+					},
+					"404": {
+						"description": "Not Found error for well-formed URIs that don't represent known UK Parliament resources (with short textual description).",
+						"content": {
+							"text/plain": {}
+						}
+					},
+					"400": {
+						"description": "Bad Request error with short textual description of the Dereference Service.",
+						"content": {
+							"text/plain": {}
+						}
+					}
+				}
+			}
+		}
+	}
+}</set-body>
+        </return-response>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound />
+    <on-error>
+        <base />
+    </on-error>
 </policies>

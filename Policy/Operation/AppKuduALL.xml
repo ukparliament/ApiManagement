@@ -1,0 +1,42 @@
+<policies>
+    <inbound>
+        <base />
+        <set-variable name="clusterItem" value="@(context.Request.Headers.GetValueOrDefault(&quot;Cluster-Item&quot;,&quot;&quot;).ToLower())" />
+        <choose>
+            <when condition="@(((string)context.Variables[&quot;clusterItem&quot;]).Equals(&quot;master&quot;))">
+                <set-variable name="userName" value="{{Test-master-name}}" />
+                <set-variable name="password" value="{{Test-master-KuduPassword}}" />
+            </when>
+            <when condition="@(((string)context.Variables[&quot;clusterItem&quot;]).Equals(&quot;worker0&quot;))">
+                <set-variable name="userName" value="{{Test-worker0-name}}" />
+                <set-variable name="password" value="{{Test-worker0-KuduPassword}}" />
+            </when>
+            <when condition="@(((string)context.Variables[&quot;clusterItem&quot;]).Equals(&quot;worker1&quot;))">
+                <set-variable name="userName" value="{{Test-worker1-name}}" />
+                <set-variable name="password" value="{{Test-worker1-KuduPassword}}" />
+            </when>
+            <when condition="@(((string)context.Variables[&quot;clusterItem&quot;]).Equals(&quot;worker2&quot;))">
+                <set-variable name="userName" value="{{Test-worker2-name}}" />
+                <set-variable name="password" value="{{Test-worker2-KuduPassword}}" />
+            </when>
+            <otherwise>
+                <return-response>
+                    <set-status code="400" reason="Bad request" />
+                    <set-body>Cluster-Item header missing or wrong value</set-body>
+                </return-response>
+            </otherwise>
+        </choose>
+        <set-variable name="url" value="@(string.Format(&quot;https://{0}.scm.appenvironment.p.azurewebsites.net/api&quot;,context.Variables[&quot;userName&quot;]))" />
+        <set-backend-service base-url="@((string)context.Variables[&quot;url&quot;])" />
+        <authentication-basic username="@(string.Format(&quot;${0}&quot;,context.Variables[&quot;userName&quot;]))" password="@((string)context.Variables[&quot;password&quot;])" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

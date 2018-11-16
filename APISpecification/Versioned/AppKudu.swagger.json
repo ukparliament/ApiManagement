@@ -1,0 +1,52 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "App kudu",
+    "version": "VERSION_PLACEHOLDER"
+  },
+  "host": "api.parliament.uk",
+  "basePath": "/kudu",
+  "schemes": [
+    "https"
+  ],
+  "securityDefinitions": {
+    "apiKeyHeader": {
+      "type": "apiKey",
+      "name": "Ocp-Apim-Subscription-Key",
+      "in": "header"
+    },
+    "apiKeyQuery": {
+      "type": "apiKey",
+      "name": "subscription-key",
+      "in": "query"
+    }
+  },
+  "security": [
+    {
+      "apiKeyHeader": []
+    },
+    {
+      "apiKeyQuery": []
+    }
+  ],
+  "paths": {
+    "/*": {
+      "get": {
+        "operationId": "get",
+        "summary": "Get",
+        "responses": {}
+      },
+      "post": {
+        "operationId": "post",
+        "summary": "Post",
+        "responses": {}
+      },
+      "put": {
+        "operationId": "put",
+        "summary": "Put",
+        "responses": {}
+      }
+    }
+  },
+  "tags": []
+}

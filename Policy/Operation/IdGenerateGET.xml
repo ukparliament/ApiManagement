@@ -1,6 +1,8 @@
 <policies>
   <inbound>
     <base />
+    <set-backend-service base-url="https://{1}.azurewebsites.net/api" />
+    <rewrite-uri template="IdGenerator" copy-unmatched-params="true" />
     <set-query-parameter name="Subscription-Key" exists-action="delete" />
     <set-header name="x-functions-key" exists-action="override">
       <value>{0}-IdGeneratorKey</value>

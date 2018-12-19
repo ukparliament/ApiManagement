@@ -1,0 +1,17 @@
+<policies>
+    <inbound>
+        <base />
+        <set-variable name="userName" value="{{APIVERSION_PLACEHOLDER-master-name}}" />
+        <set-variable name="url" value="@(string.Format(&quot;https://{0}.appenvironment.p.azurewebsites.net&quot;,context.Variables[&quot;userName&quot;]))" />
+        <set-backend-service base-url="@((string)context.Variables[&quot;url&quot;])" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

@@ -19,95 +19,96 @@ Param(
     [Parameter(Mandatory=$true)] [string] $APIResourceGroupName,
     [Parameter(Mandatory=$true)] [string] $APIManagementName,
 	[Parameter(Mandatory=$true)] [string] $APIPrefix1,
-	[Parameter(Mandatory=$true)] [string] $APIPrefix2
+	[Parameter(Mandatory=$true)] [string] $APIPrefix2,
+	[Parameter(Mandatory=$true)] [string] $GenericName1,
+	[Parameter(Mandatory=$true)] [string] $GenericName2,
+	[Parameter(Mandatory=$true)] [string] $PowershellModuleDirectory
 )
 $ErrorActionPreference = "Stop"
 
-$genericNameAPINames=@("Fixed Query","Id Generator","Photo","Search")
-$ip3rdGroupAPINames=@("Graph Store","Java Management GraphDB Master","RDF4J Master","Read-only SPARQL Endpoint")
-$namedValuesNames=@("IdGeneratorKey","WorkbenchAuthorization")
+Import-Module -Name $PowershellModuleDirectory\Write-LogToHost.psm1
 
-function Log([Parameter(Mandatory=$true)][string]$LogText){
-    Write-Host ("{0} - {1}" -f (Get-Date -Format "HH:mm:ss.fff"), $LogText)
-}
+Write-LogToHost "Swap $APIPrefix1 ($GenericName1) with $APIPrefix2 ($GenericName2)"
 
-Log "Get API Management context"
+$apiNames=@("Java Management GraphDB Master","OData","Photo","Query","RDF4J","Search","SPARQL")
+$appNames=@("fixedquery","odata","photo","func")
+
+Write-LogToHost "Get API Management context"
 $management=New-AzureRmApiManagementContext -ResourceGroupName $APIResourceGroupName -ServiceName $APIManagementName
 
-Log "Retrieve generic names"
-$apiFixedQuery1=Get-AzureRmApiManagementApi -Context $management | Where-Object Name -EQ "$APIPrefix1 - Fixed Query"
-$apiFixedQuery2=Get-AzureRmApiManagementApi -Context $management | Where-Object Name -EQ "$APIPrefix2 - Fixed Query"
-$genericName1=$apiFixedQuery1.ServiceUrl.Substring(18,$apiFixedQuery1.ServiceUrl.IndexOf('.')-18)
-$genericName2=$apiFixedQuery2.ServiceUrl.Substring(18,$apiFixedQuery2.ServiceUrl.IndexOf('.')-18)
-
-Log "Retrieve IP's 3rd groups"
-$apiGraphStore1=Get-AzureRmApiManagementApi -Context $management | Where-Object Name -EQ "$APIPrefix1 - Graph Store"
-$graphDBsubnetIP3rdGroup1=$apiGraphStore1.ServiceUrl.Split('.')[2]
-$apiGraphStore2=Get-AzureRmApiManagementApi -Context $management | Where-Object Name -EQ "$APIPrefix2 - Graph Store"
-$graphDBsubnetIP3rdGroup2=$apiGraphStore2.ServiceUrl.Split('.')[2]
-
-Log "Swap $APIPrefix1 with $APIPrefix2"
-
-Log "API Management"
-foreach ($name in $genericNameAPINames){
-	$api=Get-AzureRmApiManagementApi -Context $management -Name "$APIPrefix1 - $name" 
-	Log $api.Name	
-	Set-AzureRmApiManagementApi -Context $management -ApiId $api.ApiId -Name $api.Name -Protocols $api.Protocols -ServiceUrl $api.ServiceUrl.Replace($genericName1, $genericName2)
-	$api=Get-AzureRmApiManagementApi -Context $management -Name "$APIPrefix2 - $name" 
-	Log $api.Name	
-	Set-AzureRmApiManagementApi -Context $management -ApiId $api.ApiId -Name $api.Name -Protocols $api.Protocols -ServiceUrl $api.ServiceUrl.Replace($genericName2, $genericName1)
-}
-foreach ($name in $ip3rdGroupAPINames){
-	$api=Get-AzureRmApiManagementApi -Context $management -Name "$APIPrefix1 - $name" 
-    $v1=$api.ServiceUrl.Replace(".$graphDBsubnetIP3rdGroup1.30/", ".$graphDBsubnetIP3rdGroup2.30/")
-	Log "$($api.Name) to $v1"
-	Set-AzureRmApiManagementApi -Context $management -ApiId $api.ApiId -Name $api.Name -Protocols $api.Protocols -ServiceUrl $v1
-	$api=Get-AzureRmApiManagementApi -Context $management -Name "$APIPrefix2 - $name" 
-    $v2=$api.ServiceUrl.Replace(".$graphDBsubnetIP3rdGroup2.30/", ".$graphDBsubnetIP3rdGroup1.30/")
-	Log "$($api.Name) to $v2"    
-	Set-AzureRmApiManagementApi -Context $management -ApiId $api.ApiId -Name $api.Name -Protocols $api.Protocols -ServiceUrl $v2
-}
-foreach ($name in $namedValuesNames){
-	Log "Named value $name"
-	$namedValue1=Get-AzureRmApiManagementProperty -Context $management -Name "$APIPrefix1-$name"
-	$namedValue2=Get-AzureRmApiManagementProperty -Context $management -Name "$APIPrefix2-$name"
-	Log "Swap $($namedValue2.Value) with $($namedValue2.Value)"
-	Set-AzureRmApiManagementProperty -Context $management -PropertyId $namedValue1.PropertyId -Value $namedValue2.Value -Secret $true
-	Set-AzureRmApiManagementProperty -Context $management -PropertyId $namedValue2.PropertyId -Value $namedValue1.Value -Secret $true
+Write-LogToHost "Swap apis"
+foreach($name in $apiNames) {
+	Write-LogToHost "Api: $name"
+    $api1=Get-AzureRmApiManagementApi -Context $management -Name $name | Where-Object ApiVersion -EQ $APIPrefix1
+    $api2=Get-AzureRmApiManagementApi -Context $management -Name $name | Where-Object ApiVersion -EQ $APIPrefix2
+    Set-AzureRmApiManagementApi -Context $management -ApiId $api1.ApiId -Name $name -Protocols $api2.Protocols -ServiceUrl $api2.ServiceUrl
+    Set-AzureRmApiManagementApi -Context $management -ApiId $api2.ApiId -Name $name -Protocols $api1.Protocols -ServiceUrl $api1.ServiceUrl
 }
 
-Log "Logic App"
-$logicApp1=Get-AzureRmLogicApp -ResourceGroupName "data-orchestration$genericName1" -Name "getlist-epetition"
-$logicApp2=Get-AzureRmLogicApp -ResourceGroupName "data-orchestration$genericName2" -Name "getlist-epetition"
-$v1=$logicApp1.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("uri").Value
-$v2=$logicApp2.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("uri").Value
-Log "Swap $v1 with $v2"
-$logicApp1.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("uri").Value=$v2
-$logicApp2.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("uri").Value=$v1
-$v1=$logicApp1.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("headers").Property("Ocp-Apim-Subscription-Key").Value.Value
-$v2=$logicApp2.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("headers").Property("Ocp-Apim-Subscription-Key").Value.Value
-Log "Swap $v1 with $v2"
-$logicApp1.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("headers").Property("Ocp-Apim-Subscription-Key").Value.Value=$v2
-$logicApp2.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("headers").Property("Ocp-Apim-Subscription-Key").Value.Value=$v1
+Write-LogToHost "Swap policy for id generator"
+$api1=Get-AzureRmApiManagementApi -Context $management -Name "Id" | Where-Object ApiVersion -EQ $APIPrefix1
+$operation1=Get-AzureRmApiManagementOperation -Context $management -ApiId $api1.ApiId | Where-Object Name -EQ "Generate"
+$policy1=Get-AzureRmApiManagementPolicy -Context $management -ApiId $api1.ApiId -OperationId $operation1.OperationId
+
+$api2=Get-AzureRmApiManagementApi -Context $management -Name "Id" | Where-Object ApiVersion -EQ $APIPrefix2
+$operation2=Get-AzureRmApiManagementOperation -Context $management -ApiId $api2.ApiId | Where-Object Name -EQ "Generate"
+$policy2=Get-AzureRmApiManagementPolicy -Context $management -ApiId $api2.ApiId -OperationId $operation2.OperationId
+
+Set-AzureRmApiManagementPolicy -Context $management -ApiId $api1.ApiId -OperationId $operation1.OperationId -Policy $policy2
+Set-AzureRmApiManagementPolicy -Context $management -ApiId $api2.ApiId -OperationId $operation2.OperationId -Policy $policy1
+
+Write-LogToHost "Named value swap"
+$namedValue1=Get-AzureRmApiManagementProperty -Context $management -Name "$APIPrefix1-IdGeneratorKey"
+$namedValue2=Get-AzureRmApiManagementProperty -Context $management -Name "$APIPrefix2-IdGeneratorKey"
+Set-AzureRmApiManagementProperty -Context $management -PropertyId $namedValue1.PropertyId -Value $namedValue2.Value -Secret $true
+Set-AzureRmApiManagementProperty -Context $management -PropertyId $namedValue2.PropertyId -Value $namedValue1.Value -Secret $true
+
+Write-LogToHost "Logic App (epetition swap)"
+$logicApp1=Get-AzureRmLogicApp -ResourceGroupName "data-orchestration$GenericName1" -Name "getlist-epetition"
+$logicApp2=Get-AzureRmLogicApp -ResourceGroupName "data-orchestration$GenericName2" -Name "getlist-epetition"
+$k1=$logicApp1.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("headers").Property("Ocp-Apim-Subscription-Key").Value.Value
+$k2=$logicApp2.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("headers").Property("Ocp-Apim-Subscription-Key").Value.Value
+$v1=$logicApp1.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("headers").Property("Api-Version").Value.Value
+$v2=$logicApp2.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("headers").Property("Api-Version").Value.Value
+$logicApp1.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("headers").Property("Ocp-Apim-Subscription-Key").Value.Value=$k2
+$logicApp2.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("headers").Property("Ocp-Apim-Subscription-Key").Value.Value=$k1
+$logicApp1.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("headers").Property("Api-Version").Value.Value=$v2
+$logicApp2.Definition.Property("actions").Property("GetMaxUpdatedAt").Property("inputs").Property("headers").Property("Api-Version").Value.Value=$v1
 Set-AzureRmLogicApp -ResourceGroupName "data-orchestration$genericName1" -Name "getlist-epetition" -Definition $logicApp1.Definition -Force -Verbose
 Set-AzureRmLogicApp -ResourceGroupName "data-orchestration$genericName2" -Name "getlist-epetition" -Definition $logicApp2.Definition -Force -Verbose
 
-Log "Azure Functions"
-$webApp1=Get-AzureRmWebApp -ResourceGroupName "data-orchestration$genericName1" -Name "func$genericName1"
-$webApp2=Get-AzureRmWebApp -ResourceGroupName "data-orchestration$genericName2" -Name "func$genericName2"
-$settings1=@{}
-foreach($set in $webApp1.SiteConfig.AppSettings){ 
-    $settings1[$set.Name]=$set.Value
+Write-LogToHost "App settings swap"
+foreach ($name in $appNames) {
+	Write-LogToHost "App: $name"
+	$webApp1=Get-AzureRmWebApp -Name "$name$genericName1"
+	$webApp2=Get-AzureRmWebApp -Name "$name$genericName2"
+	$settings1=@{}
+	foreach($set in $webApp1.SiteConfig.AppSettings){ 
+		$settings1[$set.Name]=$set.Value
+	}
+	$settings2=@{}
+	foreach($set in $webApp2.SiteConfig.AppSettings){ 
+		$settings2[$set.Name]=$set.Value
+	}
+
+	$appSettingsNames=@("SubscriptionKey","ApiVersion")
+	if ($name -eq "photo"){
+		$appSettingsNames=@("Query__SubscriptionKey","Query__ApiVersion")
+	}
+	foreach ($settingName in $appSettingsNames) {
+		$s1=$settings1[$settingName]
+		$s2=$settings2[$settingName]
+		$settings1[$settingName]=$s2
+		$settings2[$settingName]=$s1	
+	}	
+
+	Set-AzureRmWebApp -ResourceGroupName $($webApp1.ResourceGroup) -Name "$name$genericName1" -AppSettings $settings1 
+	Set-AzureRmWebApp -ResourceGroupName $($webApp2.ResourceGroup) -Name "$name$genericName2" -AppSettings $settings2
 }
-$settings2=@{}
-foreach($set in $webApp2.SiteConfig.AppSettings){ 
-    $settings2[$set.Name]=$set.Value
-}
-$v1=$settings1["SubscriptionKey"]
-$v2=$settings2["SubscriptionKey"]
-Log "Swap $v1 with $v2"
-$settings1["SubscriptionKey"]=$v2
-$settings2["SubscriptionKey"]=$v1
+
+Write-LogToHost "Connection string swap"
+$webApp1=Get-AzureRmWebApp -Name "func$genericName1"
+$webApp2=Get-AzureRmWebApp -Name "func$genericName2"
 $connections1 = @{}
 foreach($connection in $webApp1.SiteConfig.ConnectionStrings){
 	$connections1[$connection.Name]=@{Type=if ($connection.Type -eq $null){"Custom"}else{$connection.Type.ToString()};Value=$connection.ConnectionString}	
@@ -116,89 +117,12 @@ $connections2 = @{}
 foreach($connection in $webApp2.SiteConfig.ConnectionStrings){
 	$connections2[$connection.Name]=@{Type=if ($connection.Type -eq $null){"Custom"}else{$connection.Type.ToString()};Value=$connection.ConnectionString}	
 }
-$v1=$connections1["Data"]
-$v2=$connections2["Data"] 
-Log "Swap $v1 with $v2"
-$connections1["Data"]=$v2
-$connections2["Data"]=$v1
-Set-AzureRmWebApp -ResourceGroupName "data-orchestration$genericName1" -Name "func$genericName1" -AppSettings $settings1 -ConnectionStrings $connections1
-Set-AzureRmWebApp -ResourceGroupName "data-orchestration$genericName2" -Name "func$genericName2" -AppSettings $settings2 -ConnectionStrings $connections2
 
-Log "Web apps"
+$v1=$connections1["InterimSqlServer"]
+$v2=$connections2["InterimSqlServer"] 
+$connections1["InterimSqlServer"]=$v2
+$connections2["InterimSqlServer"]=$v1
+Set-AzureRmWebApp -ResourceGroupName $($webApp1.ResourceGroup) -Name "func$genericName1" -ConnectionStrings $connections1
+Set-AzureRmWebApp -ResourceGroupName $($webApp2.ResourceGroup) -Name "func$genericName2" -ConnectionStrings $connections2
 
-Log "Fixed query"
-$webApp1=Get-AzureRmWebApp -ResourceGroupName "data-api" -Name "fixedquery$genericName1"
-$webApp2=Get-AzureRmWebApp -ResourceGroupName "data-api" -Name "fixedquery$genericName2"
-$settings1=@{}
-foreach($set in $webApp1.SiteConfig.AppSettings){ 
-    $settings1[$set.Name]=$set.Value
-}
-$settings2=@{}
-foreach($set in $webApp2.SiteConfig.AppSettings){ 
-    $settings2[$set.Name]=$set.Value
-}
-$v1=$settings1["SubscriptionKey"]
-$v2=$settings2["SubscriptionKey"]
-Log "Swap $v1 with $v2"
-$settings1["SubscriptionKey"]=$v2
-$settings2["SubscriptionKey"]=$v1
-$v1=$settings1["SparqlEndpoint"]
-$v2=$settings2["SparqlEndpoint"]
-Log "Swap $v1 with $v2"
-$settings1["SparqlEndpoint"]=$v2
-$settings2["SparqlEndpoint"]=$v1
-Set-AzureRmWebApp -ResourceGroupName "data-api" -Name "fixedquery$genericName1" -AppSettings $settings1
-Set-AzureRmWebApp -ResourceGroupName "data-api" -Name "fixedquery$genericName2" -AppSettings $settings2
-
-Log "Photo"
-$webApp1=Get-AzureRmWebApp -ResourceGroupName "data-api" -Name "photo$genericName1"
-$webApp2=Get-AzureRmWebApp -ResourceGroupName "data-api" -Name "photo$genericName2"
-$settings1=@{}
-foreach($set in $webApp1.SiteConfig.AppSettings){ 
-    $settings1[$set.Name]=$set.Value
-}
-$settings2=@{}
-foreach($set in $webApp2.SiteConfig.AppSettings){ 
-    $settings2[$set.Name]=$set.Value
-}
-$v1=$settings1["SubscriptionKey"]
-$v2=$settings2["SubscriptionKey"]
-Log "Swap $v1 with $v2"
-$settings1["SubscriptionKey"]=$v2
-$settings2["SubscriptionKey"]=$v1
-$connections1 = @{}
-foreach($connection in $webApp1.SiteConfig.ConnectionStrings){
-	$connections1[$connection.Name]=@{Type=if ($connection.Type -eq $null){"Custom"}else{$connection.Type.ToString()};Value=$connection.ConnectionString}	
-}
-$connections2 = @{}
-foreach($connection in $webApp2.SiteConfig.ConnectionStrings){
-	$connections2[$connection.Name]=@{Type=if ($connection.Type -eq $null){"Custom"}else{$connection.Type.ToString()};Value=$connection.ConnectionString}	
-}
-$v1=$connections1["FixedQuery"]
-$v2=$connections2["FixedQuery"]
-Log "Swap $v1 with $v2"
-$connections1["FixedQuery"]=$v2
-$connections2["FixedQuery"]=$v1
-Set-AzureRmWebApp -ResourceGroupName "data-api" -Name "photo$genericName1" -ConnectionStrings $connections1 -AppSettings $settings1
-Set-AzureRmWebApp -ResourceGroupName "data-api" -Name "photo$genericName2" -ConnectionStrings $connections2 -AppSettings $settings2
-
-Log "Search"
-$webApp1=Get-AzureRmWebApp -ResourceGroupName "data-api" -Name "search$genericName1"
-$webApp2=Get-AzureRmWebApp -ResourceGroupName "data-api" -Name "search$genericName2"
-$settings1=@{}
-foreach($set in $webApp1.SiteConfig.AppSettings){ 
-    $settings1[$set.Name]=$set.Value
-}
-$settings2=@{}
-foreach($set in $webApp2.SiteConfig.AppSettings){ 
-    $settings2[$set.Name]=$set.Value
-}
-$v1=$settings1["ApiManagementServiceUrl"]
-$v2=$settings2["ApiManagementServiceUrl"]
-Log "Swap $v1 with $v2"
-$settings1["ApiManagementServiceUrl"]=$v2
-$settings2["ApiManagementServiceUrl"]=$v1
-Set-AzureRmWebApp -ResourceGroupName "data-api" -Name "search$genericName1" -AppSettings $settings1
-Set-AzureRmWebApp -ResourceGroupName "data-api" -Name "search$genericName2" -AppSettings $settings2
-
-Log "Job well done!"
+Write-LogToHost "Job well done!"

@@ -15,6 +15,17 @@ Name of the API Management.
 This script is for use as a part of deployment in VSTS only.
 #>
 
+<#TODO
+switch
+	id generate
+		backend
+		policy - named value 
+	when switching to live original has to be updated
+	network security group - indexing and search
+new env
+	api mngmt: update 3rd ip section
+	api mngmt: update api domains
+#>
 Param(
     [Parameter(Mandatory=$true)] [string] $APIResourceGroupName,
     [Parameter(Mandatory=$true)] [string] $APIManagementName,

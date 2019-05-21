@@ -17,23 +17,23 @@ This script is for use as a part of deployment in VSTS only.
 
 <#TODO
 switch
-	id generate
-		backend
-		policy - named value 
-	when switching to live original has to be updated
-	network security group - indexing and search
+    id generate
+        backend
+        policy - named value 
+    when switching to live original has to be updated
+    network security group - indexing and search
 new env
-	api mngmt: update 3rd ip section
-	api mngmt: update api domains
+    api mngmt: update 3rd ip section
+    api mngmt: update api domains
 #>
 Param(
     [Parameter(Mandatory=$true)] [string] $APIResourceGroupName,
     [Parameter(Mandatory=$true)] [string] $APIManagementName,
-	[Parameter(Mandatory=$true)] [string] $APIPrefix1,
-	[Parameter(Mandatory=$true)] [string] $APIPrefix2,
-	[Parameter(Mandatory=$true)] [string] $GenericName1,
-	[Parameter(Mandatory=$true)] [string] $GenericName2,
-	[Parameter(Mandatory=$true)] [string] $PowershellModuleDirectory
+    [Parameter(Mandatory=$true)] [string] $APIPrefix1,
+    [Parameter(Mandatory=$true)] [string] $APIPrefix2,
+    [Parameter(Mandatory=$true)] [string] $GenericName1,
+    [Parameter(Mandatory=$true)] [string] $GenericName2,
+    [Parameter(Mandatory=$true)] [string] $PowershellModuleDirectory
 )
 $ErrorActionPreference = "Stop"
 
@@ -49,7 +49,7 @@ $management=New-AzureRmApiManagementContext -ResourceGroupName $APIResourceGroup
 
 Write-LogToHost "Swap apis"
 foreach($name in $apiNames) {
-	Write-LogToHost "Api: $name"
+    Write-LogToHost "Api: $name"
     $api1=Get-AzureRmApiManagementApi -Context $management -Name $name | Where-Object ApiVersion -EQ $APIPrefix1
     $api2=Get-AzureRmApiManagementApi -Context $management -Name $name | Where-Object ApiVersion -EQ $APIPrefix2
     Set-AzureRmApiManagementApi -Context $management -ApiId $api1.ApiId -Name $name -Protocols $api2.Protocols -ServiceUrl $api2.ServiceUrl
@@ -90,31 +90,31 @@ Set-AzureRmLogicApp -ResourceGroupName "data-orchestration$genericName2" -Name "
 
 Write-LogToHost "App settings swap"
 foreach ($name in $appNames) {
-	Write-LogToHost "App: $name"
-	$webApp1=Get-AzureRmWebApp -Name "$name$genericName1"
-	$webApp2=Get-AzureRmWebApp -Name "$name$genericName2"
-	$settings1=@{}
-	foreach($set in $webApp1.SiteConfig.AppSettings){ 
-		$settings1[$set.Name]=$set.Value
-	}
-	$settings2=@{}
-	foreach($set in $webApp2.SiteConfig.AppSettings){ 
-		$settings2[$set.Name]=$set.Value
-	}
+    Write-LogToHost "App: $name"
+    $webApp1=Get-AzureRmWebApp -Name "$name$genericName1"
+    $webApp2=Get-AzureRmWebApp -Name "$name$genericName2"
+    $settings1=@{}
+    foreach($set in $webApp1.SiteConfig.AppSettings){ 
+        $settings1[$set.Name]=$set.Value
+    }
+    $settings2=@{}
+    foreach($set in $webApp2.SiteConfig.AppSettings){ 
+        $settings2[$set.Name]=$set.Value
+    }
 
-	$appSettingsNames=@("SubscriptionKey","ApiVersion")
-	if ($name -eq "photo"){
-		$appSettingsNames=@("Query__SubscriptionKey","Query__ApiVersion")
-	}
-	foreach ($settingName in $appSettingsNames) {
-		$s1=$settings1[$settingName]
-		$s2=$settings2[$settingName]
-		$settings1[$settingName]=$s2
-		$settings2[$settingName]=$s1	
-	}	
+    $appSettingsNames=@("SubscriptionKey","ApiVersion")
+    if ($name -eq "photo"){
+        $appSettingsNames=@("Query__SubscriptionKey","Query__ApiVersion")
+    }
+    foreach ($settingName in $appSettingsNames) {
+        $s1=$settings1[$settingName]
+        $s2=$settings2[$settingName]
+        $settings1[$settingName]=$s2
+        $settings2[$settingName]=$s1    
+    }    
 
-	Set-AzureRmWebApp -ResourceGroupName $($webApp1.ResourceGroup) -Name "$name$genericName1" -AppSettings $settings1 
-	Set-AzureRmWebApp -ResourceGroupName $($webApp2.ResourceGroup) -Name "$name$genericName2" -AppSettings $settings2
+    Set-AzureRmWebApp -ResourceGroupName $($webApp1.ResourceGroup) -Name "$name$genericName1" -AppSettings $settings1
+    Set-AzureRmWebApp -ResourceGroupName $($webApp2.ResourceGroup) -Name "$name$genericName2" -AppSettings $settings2
 }
 
 Write-LogToHost "Connection string swap"
@@ -122,11 +122,11 @@ $webApp1=Get-AzureRmWebApp -Name "func$genericName1"
 $webApp2=Get-AzureRmWebApp -Name "func$genericName2"
 $connections1 = @{}
 foreach($connection in $webApp1.SiteConfig.ConnectionStrings){
-	$connections1[$connection.Name]=@{Type=if ($connection.Type -eq $null){"Custom"}else{$connection.Type.ToString()};Value=$connection.ConnectionString}	
+    $connections1[$connection.Name]=@{Type=if ($connection.Type -eq $null){"Custom"}else{$connection.Type.ToString()};Value=$connection.ConnectionString}
 }
 $connections2 = @{}
 foreach($connection in $webApp2.SiteConfig.ConnectionStrings){
-	$connections2[$connection.Name]=@{Type=if ($connection.Type -eq $null){"Custom"}else{$connection.Type.ToString()};Value=$connection.ConnectionString}	
+    $connections2[$connection.Name]=@{Type=if ($connection.Type -eq $null){"Custom"}else{$connection.Type.ToString()};Value=$connection.ConnectionString}
 }
 
 $v1=$connections1["InterimSqlServer"]

@@ -32,9 +32,9 @@ Log "Create API Health"
 $serviceUrl="https://$APIManagementName.portal.azure-api.net"
 $apiHealth=Get-AzureRmApiManagementApi -Context $management | where ServiceUrl -EQ $serviceUrl
 if ($apiHealth -eq $null) {
-	$apiHealth=New-AzureRmApiManagementApi -Context $management -Name "API Health" -ServiceUrl $serviceUrl -Protocols @("https") -Path "/api-health"
-	$operationAPIHealth=New-AzureRmApiManagementOperation -Context $management -ApiId $apiHealth.ApiId -Name "Get" -Method "GET" -UrlTemplate "/*"
-	Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiHealth.ApiId -OperationId $operationAPIHealth.OperationId -PolicyFilePath "$PoliciesFolderLocation\APIHealthGET.xml"
+    $apiHealth=New-AzureRmApiManagementApi -Context $management -Name "API Health" -ServiceUrl $serviceUrl -Protocols @("https") -Path "/api-health"
+    $operationAPIHealth=New-AzureRmApiManagementOperation -Context $management -ApiId $apiHealth.ApiId -Name "Get" -Method "GET" -UrlTemplate "/*"
+    Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiHealth.ApiId -OperationId $operationAPIHealth.OperationId -PolicyFilePath "$PoliciesFolderLocation\APIHealthGET.xml"
 }
 
 Log "Create API product"

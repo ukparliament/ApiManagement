@@ -3,7 +3,68 @@
     <base />
     <return-response>
       <set-status code="200" reason="OK" />
-      <set-body>/* TEAM */</set-body>
+      <set-body>
+        /* TEAM */
+
+        Directed by: Samu Lang
+        CV: https://linkedin.com/in/langsamu
+        Code: https://github.com/langsamu
+        Q&amp;A: https://stackoverflow.com/users/359704/samu-lang
+        Twitter: @langsamu
+
+        Built by: Chris Alcock
+        CV: https://linkedin.com/in/christopher-alcock
+        Code: https://github.com/christopheralcock
+        Twitter: @chrisalcockdev
+
+        Built by: Matthieu Bosquet
+        CV: https://www.linkedin.com/in/bosquetmatthieu/
+        Code: https://github.com/matthieubosquet
+        Twitter: @cognithive
+
+        Built by: Mike Marcus
+        CV: https://linkedin.com/in/michael-marcus-
+
+        Built by: Kunal Patel
+
+        Built by: Wojciech Stawiarski
+        Code: https://github.com/hellikopter
+
+        Built by: Jianhan Zhu
+        Twitter: @jianhanzhu
+
+        /* THANKS */
+
+        Search: Robert Brook
+        Site: http://robert-brook.com/
+
+        Domain model: Michael Smethurst
+        Site: http://smethur.st/
+        Twitter: @fantasticlife
+
+        Vocabulary: Anya Somerville
+        Twitter: @bitten_
+
+        Website: Jamie Tetlow
+        Twitter: @oddtype
+
+        Analysis: Liz Thomas
+
+        /* FORMER TEAM MEMBERS */
+
+        Built by: Raphael Leung
+        Code: https://github.com/lcyraphael
+        CV: https://www.linkedin.com/in/raphael-leung-635b9232/
+
+        Built by: Alex Howes
+        Twitter: @AlexEdwardH
+
+        Analysis: Sara Reis
+        Twitter: @sarafreis
+
+        Produced by: Dan Barrett
+        Twitter: @dasbarrett
+      </set-body>
     </return-response>
   </inbound>
   <backend>

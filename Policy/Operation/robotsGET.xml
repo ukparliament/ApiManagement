@@ -5,9 +5,14 @@
       <set-status code="200" reason="OK" />
       <set-body>
         User-agent: *
-        Disallow: /
-        Allow: /Live/photo
-        Allow: /photo
+
+        Allow: /query/openapi.json
+        Allow: /odata/openapi.json
+        Allow: /photo/openapi.json
+
+        Disallow: /query
+        Disallow: /odata
+        Disallow: /search/query
       </set-body>
     </return-response>
   </inbound>

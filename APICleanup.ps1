@@ -28,12 +28,12 @@ function Log([Parameter(Mandatory=$true)][string]$LogText){
 Log "Get API Management context"
 $management=New-AzureRmApiManagementContext -ResourceGroupName $APIResourceGroupName -ServiceName $APIManagementName
 
-Log "Remove examples"
-
 Log "Remove subscriptions to API Products"
 Get-AzureRmApiManagementSubscription -Context $management | Remove-AzureRmApiManagementSubscription -Context $management
+
 Log "Remove API Products"
 Get-AzureRmApiManagementProduct -Context $management | Remove-AzureRmApiManagementProduct -Context $management
+
 Log "Remove endpoints"
 Get-AzureRmApiManagementApi -Context $management | Select-Object ApiId -ExpandProperty ApiId | Remove-AzureRmApiManagementApi -Context $management
 

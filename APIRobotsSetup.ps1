@@ -32,9 +32,9 @@ Log "Create robots.txt"
 $serviceUrl=""
 $apiRobots=Get-AzureRmApiManagementApi -Context $management | where ServiceUrl -EQ $serviceUrl
 if ($apiRobots -eq $null) {
-	$apiRobots=New-AzureRmApiManagementApi -Context $management -Name "robots.txt" -ServiceUrl $serviceUrl -Protocols @("http","https") -Path "/robots.txt"
-	$operationAPIRobots=New-AzureRmApiManagementOperation -Context $management -ApiId $apiRobots.ApiId -Name "Get" -Method "GET" -UrlTemplate "/"
-	Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiRobots.ApiId -OperationId $operationAPIRobots.OperationId -PolicyFilePath "$PoliciesFolderLocation\APIRobotsGET.xml"
+    $apiRobots=New-AzureRmApiManagementApi -Context $management -Name "robots.txt" -ServiceUrl $serviceUrl -Protocols @("http","https") -Path "/robots.txt"
+    $operationAPIRobots=New-AzureRmApiManagementOperation -Context $management -ApiId $apiRobots.ApiId -Name "Get" -Method "GET" -UrlTemplate "/"
+    Set-AzureRmApiManagementPolicy -Context $management -ApiId $apiRobots.ApiId -OperationId $operationAPIRobots.OperationId -PolicyFilePath "$PoliciesFolderLocation\APIRobotsGET.xml"
 }
 
 Log "Create API product"
